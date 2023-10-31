@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.red.xip.login.mapper.LoginMapper">
+
+	<select id="getLoginCheck" 
+		parameterType = "com.red.xip.login.model.P_Login"
+		resultType="com.red.xip.login.model.R_Login">
+	
+		SELECT PW
+		FROM   XIP_USERS
+		WHERE  EMAIL = #{email}
+		
+	</select>
+	
+	<select id="selectEmailCheck" 
+		parameterType = "com.red.xip.login.model.P_Login"
+		resultType="int">
+		
+		SELECT COUNT (USER_CD)
+		FROM   XIP_USERS
+		WHERE  EMAIL = #{email}
+	</select>
+	
+	<insert id="insertCreateAccount" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		
+		INSERT INTO XIP_USERS(
+			EMAIL,
+			PW,
+			LAST_NM,
+			FIRST_NM,
+			GENDER,
+			COUNTRY,
+			TERMS_OF_USE,
+			PRIVAC,
+			CREAT_DT,
+			MODIFY_DT
+		)
+		VALUES (
+			#{email},
+			#{pw},
+			#{lastNm},
+			#{firstNm},
+			#{gender},
+			'KOR',
+			NOW(),
+			NOW(),
+			NOW(),
+			NOW()
+		)
+	</insert>
+	
+	<insert id="insertAuthCd" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		
+		INSERT INTO EMAIL_AUTH_CODE(
+			EMAIL,
+			CODE,
+			CREAT_DT,
+			MODIFY_DT
+		)
+		VALUES (
+			REPLACE(#{email},' ',''),
+			#{authCd},
+			NOW(),
+			NOW()
+		)
+		ON DUPLICATE KEY UPDATE 
+		CODE = #{authCd},
+		MODIFY_DT = NOW();
+	</insert>
+	
+	
+	<select id="selectEmailAuthCodeCheck" 
+		parameterType = "com.red.xip.login.model.P_Login"
+		resultType="int">
+		
+		SELECT COUNT(EMAIL)
+		FROM   EMAIL_AUTH_CODE
+		WHERE  EMAIL = REPLACE(#{email},' ','')
+		AND    CODE = #{authCd}
+		
+	</select>
+	
+</mapper>
