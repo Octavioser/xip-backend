@@ -15,6 +15,7 @@ import com.red.xip.login.service.LoginService;
 //@CrossOrigin("http://172.30.1.53:3000/")
 public class LoginController {
 
+	// C100생성 R000출력 U200갱신 D300삭제
 	@Autowired
 	LoginService service;
 	
@@ -33,8 +34,8 @@ public class LoginController {
 //    		System.out.println("쿠키 정보 전달 완료 : "+ String.valueOf(param));
     		return service.getLoginCheck(param);
 		} catch (Exception e) {
-			
-			return null;
+			e.printStackTrace();
+			return -1;
 		}
 	}
 	
@@ -46,8 +47,8 @@ public class LoginController {
     	try {
     		return service.selectEmailCheck(param);
 		} catch (Exception e) {
-			
-			return null;
+			e.printStackTrace();
+			return -1;
 		}
 	}
 	
@@ -59,21 +60,21 @@ public class LoginController {
     	try {
     		return service.selectEmailAuthCodeCheck(param);
 		} catch (Exception e) {
-			
-			return null;
+			e.printStackTrace();
+			return -1;
 		}
 	}
 	
 	// 회원가입
-	@PostMapping("/loginR101")
+	@PostMapping("/loginC101")
 	@ResponseBody
 	public Object insertCreateAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
     		return service.insertCreateAccount(param);
 		} catch (Exception e) {
-			
-			return null;
+			e.printStackTrace();
+			return -1;
 		}
 	}
 }

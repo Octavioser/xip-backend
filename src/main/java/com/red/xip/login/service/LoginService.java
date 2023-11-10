@@ -1,7 +1,5 @@
 package com.red.xip.login.service;
 
-import java.security.Key;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -11,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.red.xip.common.SecurityConstants;
 import com.red.xip.login.mapper.LoginMapper;
 import com.red.xip.login.model.P_Login;
 import com.red.xip.login.model.R_Login;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 
 @Service
 public class LoginService {
@@ -27,29 +24,34 @@ public class LoginService {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
-	private Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+
 	
 	public List<R_Login> getLoginCheck(P_Login param) {
-		
-		List<R_Login> resultData = mapper.getLoginCheck(param);
+		try {
+			List<R_Login> resultData = mapper.getLoginCheck(param);
 
-		if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
-			resultData.get(0).setStatus(1);
-			Date now = new Date();
-			String token = Jwts.builder()
-					.setSubject(resultData.get(0).getEmail())       // 토큰의 주제 설정 (예: 사용자 ID)
-					.setIssuedAt(now)                               // 토큰 발급일
-//					.setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis())) // 토큰 만료일
-				    .signWith(key) // 서명 알고리즘과 비밀 키 설정
-				    .compact();	
-			resultData.get(0).setToken(token);    // 토큰넣어주기
-		}
-		else {
+			if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
+				resultData.get(0).setStatus(1);
+				Date now = new Date();
+				String token = Jwts.builder()
+						.setSubject(resultData.get(0).getUserCd())       // 토큰의 주제 설정 (예: 사용자 ID)
+						.claim("email", resultData.get(0).getEmail())     // 사용자 이메일 추가
+						.setIssuedAt(now)                                // 토큰 발급일
+//						.setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis())) // 토큰 만료일
+					    .signWith(SecurityConstants.JWT_SECRET_KEY) // 서명 알고리즘과 비밀 키 설정
+					    .compact();	
+				resultData.get(0).setToken(token);    // 토큰넣어주기
+				return resultData;
+			}
+			else {
+				
+				return Collections.emptyList();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
 			return Collections.emptyList();
 		}
-		
-		return resultData;
 	}
 
 	// 이메일 체크
@@ -58,16 +60,16 @@ public class LoginService {
 			Random random = new Random();
 			
 			int count = mapper.selectEmailCheck(param);
-			System.out.println("카운트==>" + count);
 			if(count == 0) {
 				int createNum;
 				String ranNum;
 				String resultNum = "";
-				for (int i=0; i<6; i++) { 
-					createNum = random.nextInt(9);		//0부터 9까지 올 수 있는 1자리 난수 생성
-					ranNum =  Integer.toString(createNum);  //1자리 난수를 String으로 형변환
-					resultNum += ranNum;			//생성된 난수(문자열)을 원하는 수(letter)만큼 더하며 나열
-				}	
+//				for (int i=0; i<6; i++) { 
+//					createNum = random.nextInt(9);		//0부터 9까지 올 수 있는 1자리 난수 생성
+//					ranNum =  Integer.toString(createNum);  //1자리 난수를 String으로 형변환
+//					resultNum += ranNum;			//생성된 난수(문자열)을 원하는 수(letter)만큼 더하며 나열
+//				}
+				resultNum = "970820";
 				System.out.println("인증코드==>" + resultNum);
 				param.setAuthCd(resultNum);
 				mapper.insertAuthCd(param);

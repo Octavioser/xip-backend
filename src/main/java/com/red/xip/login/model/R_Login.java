@@ -15,4 +15,5 @@ public class R_Login {
 	private String lastNm;
 	private String token;
 	private String authCd;
+	private String userCd;
 }

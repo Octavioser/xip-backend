@@ -7,7 +7,7 @@
 		parameterType = "com.red.xip.login.model.P_Login"
 		resultType="com.red.xip.login.model.R_Login">
 	
-		SELECT PW
+		SELECT PW, EMAIL, USER_CD
 		FROM   XIP_USERS
 		WHERE  EMAIL = #{email}
 		
@@ -75,12 +75,13 @@
 	<select id="selectEmailAuthCodeCheck" 
 		parameterType = "com.red.xip.login.model.P_Login"
 		resultType="int">
-		
-		SELECT COUNT(EMAIL)
-		FROM   EMAIL_AUTH_CODE
-		WHERE  EMAIL = REPLACE(#{email},' ','')
-		AND    CODE = #{authCd}
-		
+		<![CDATA[
+			SELECT COUNT(EMAIL)
+			FROM   EMAIL_AUTH_CODE
+			WHERE  EMAIL = REPLACE(#{email},' ','')
+			AND    CODE = #{authCd}
+			AND    DATE_ADD(MODIFY_DT, INTERVAL 3 MINUTE) > NOW()
+		]]>
 	</select>
 	
 </mapper>
