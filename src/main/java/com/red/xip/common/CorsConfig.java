@@ -16,7 +16,7 @@ public class CorsConfig { // cors 설정
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of("http://localhost:3030"));
+        config.setAllowedOrigins(List.of("http://localhost:3030", "https://www.xip.red"));
         config.setAllowedMethods(List.of("POST"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("*"));
