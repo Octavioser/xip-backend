@@ -17,6 +17,9 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 application.properties
+application-dev.properties
+application-prod.properties
+
 
 ### IntelliJ IDEA ###
 .idea
@@ -36,3 +39,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### SSL ###
+keystore.p12
