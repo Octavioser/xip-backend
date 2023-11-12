@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.red.xip.awsSesEmail.service.AwsSesService;
 import com.red.xip.common.SecurityConstants;
 import com.red.xip.login.mapper.LoginMapper;
 import com.red.xip.login.model.P_Login;
@@ -24,6 +25,9 @@ public class LoginService {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	AwsSesService awsSesService;
 
 	
 	public List<R_Login> getLoginCheck(P_Login param) {
@@ -62,16 +66,36 @@ public class LoginService {
 			int count = mapper.selectEmailCheck(param);
 			if(count == 0) {
 				int createNum;
-				String ranNum;
+				String ranNum = "";
 				String resultNum = "";
-//				for (int i=0; i<6; i++) { 
-//					createNum = random.nextInt(9);		//0부터 9까지 올 수 있는 1자리 난수 생성
-//					ranNum =  Integer.toString(createNum);  //1자리 난수를 String으로 형변환
-//					resultNum += ranNum;			//생성된 난수(문자열)을 원하는 수(letter)만큼 더하며 나열
-//				}
-				resultNum = "970820";
-				System.out.println("인증코드==>" + resultNum);
+				for (int i=0; i<6; i++) { 
+					createNum = random.nextInt(9);		//0부터 9까지 올 수 있는 1자리 난수 생성
+					ranNum =  Integer.toString(createNum);  //1자리 난수를 String으로 형변환
+					resultNum += ranNum;			//생성된 난수(문자열)을 원하는 수(letter)만큼 더하며 나열
+				}
+				
+				
 				param.setAuthCd(resultNum);
+				String emailContent =
+			    		"<!DOCTYPE html>\n" +
+					    "<html lang=\"en\">\n" +
+					    "<head>\n" +
+					    "    <meta charset=\"utf-8\">\n" +
+					    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+					    "    <title>Example HTML Email</title>\n" +
+					    "</head>\n" +
+					    "<body style=\"background: red; padding: 30px; height: 100%; text-align: center\">\n" +
+					    "    <h5 style=\"color: #FFFFFF; font-size: 40px;\">X I P</h5>\n" +
+					    "    <p></p>\n" +
+					    "    <p style=\"color: #FFFFFF; font-size: 30px; font-weight: 500\">VERIFICATION CODE</p>\n" +
+					    "    <p style=\"color: #FFFFFF; font-size: 20px\">" + resultNum + "</p>\n" + 
+					    "</body>\n" +
+					    "</html>";
+
+			    String senderEmail = "xipservice@xip.red";
+			    String receiverEmail = param.getEmail();
+			    String emailSubject = "Customer account confirmation";
+				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
 				mapper.insertAuthCd(param);
 			}
 			return count;
