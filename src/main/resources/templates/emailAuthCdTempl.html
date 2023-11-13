@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Email</title>
+</head>
+<body style="background-color: #FFFFFF; color: red; text-align: center; font-family: 'Roboto', sans-serif;">
+	<div style="background-color: #FFFFFF;">
+	    <!-- 이미지 -->
+	    <img th:src="@{https://xip-bucket.s3.ap-northeast-2.amazonaws.com/xItem/i/login/xiptwWhiteLogo.webp}" style="background-color: #FFFFFF; width: 200px;" /><br/><br/> 
+	
+	    <!-- 검증 코드 -->
+	    <div class="verification-code" style="letter-spacing:27px; text-indent:27px; text-align: center; color: red; font-weight: 900; margin: 0; display: inline-block;">
+	    	<h2 style="font-size: 30px" th:text="${resultNum}"> </h2>
+	    </div> 
+		
+		<div style="height: 10px;"></div>
+		
+	    <!-- 내용 -->
+	    <div class="content" style="text-align: center; color: red; font-weight: 800;">
+	        <p>
+		        Thanks for starting the new account creation<br/>  
+		        process. We want to make sure it's really you.<br/>
+		        Please enter the following verification code <br/>
+		        when prompted. If you don’t want to create an<br/> 
+		        account, you can ignore this message.
+	        </p>
+	    </div><br/> 
+	
+	    <!-- 링크 -->
+	    <a href="http://www.xip.red" class="link" style="color: red; text-decoration: none; font-weight: 800;">www.xip.red</a>
+	</div>
+</body>
+</html>

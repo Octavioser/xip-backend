@@ -8,6 +8,8 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.red.xip.awsSesEmail.service.AwsSesService;
 import com.red.xip.common.SecurityConstants;
@@ -28,6 +30,9 @@ public class LoginService {
 	
 	@Autowired
 	AwsSesService awsSesService;
+	
+	@Autowired // 이메일템플릿
+    private TemplateEngine templateEngine;
 
 	
 	public List<R_Login> getLoginCheck(P_Login param) {
@@ -76,22 +81,29 @@ public class LoginService {
 				
 				
 				param.setAuthCd(resultNum);
-				String emailContent =
-			    		"<!DOCTYPE html>\n" +
-					    "<html lang=\"en\">\n" +
-					    "<head>\n" +
-					    "    <meta charset=\"utf-8\">\n" +
-					    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
-					    "    <title>Example HTML Email</title>\n" +
-					    "</head>\n" +
-					    "<body style=\"background: red; padding: 30px; height: 100%; text-align: center\">\n" +
-					    "    <h5 style=\"color: #FFFFFF; font-size: 40px;\">X I P</h5>\n" +
-					    "    <p></p>\n" +
-					    "    <p style=\"color: #FFFFFF; font-size: 30px; font-weight: 500\">VERIFICATION CODE</p>\n" +
-					    "    <p style=\"color: #FFFFFF; font-size: 20px\">" + resultNum + "</p>\n" + 
-					    "</body>\n" +
-					    "</html>";
+//				String emailContent =
+//			    		"<!DOCTYPE html>\n" +
+//					    "<html lang=\"en\">\n" +
+//					    "<head>\n" +
+//					    "    <meta charset=\"utf-8\">\n" +
+//					    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
+//					    "    <title>Example HTML Email</title>\n" +
+//					    "</head>\n" +
+//					    "<body style=\"background: red; padding: 30px; height: 100%; text-align: center\">\n" +
+//					    "    <h5 style=\"color: #FFFFFF; font-size: 40px;\">X I P</h5>\n" +
+//					    "    <p></p>\n" +
+//					    "    <p style=\"color: #FFFFFF; font-size: 30px; font-weight: 500\">VERIFICATION CODE</p>\n" +
+//					    "    <p style=\"color: #FFFFFF; font-size: 20px\">" + resultNum + "</p>\n" + 
+//					    "</body>\n" +
+//					    "</html>";
+				// HTML 파일 읽기
+				
+				Context context = new Context();
+		        context.setVariable("resultNum", resultNum);
 
+		        // 템플릿 엔진을 사용하여 HTML 컨텐츠 생성
+		        String emailContent = templateEngine.process("emailAuthCdTempl", context);
+		        
 			    String senderEmail = "xipservice@xip.red";
 			    String receiverEmail = param.getEmail();
 			    String emailSubject = "Customer account confirmation";
