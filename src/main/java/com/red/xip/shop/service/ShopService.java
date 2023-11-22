@@ -3,6 +3,7 @@ package com.red.xip.shop.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.red.xip.shop.mapper.ShopMapper;
@@ -15,7 +16,34 @@ public class ShopService {
 	@Autowired
 	ShopMapper mapper;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	public List<R_Shop> selectDetailAccount (P_Shop param) throws Exception {
+		
 		return mapper.selectDetailAccount(param);
+	}
+
+	public int updateAccountInfoNm(P_Shop param) throws Exception {
+		
+		return mapper.updateAccountInfoNm(param);
+	}
+	
+	public int updateAccountInfoPw(P_Shop param) throws Exception {
+		
+
+		List<R_Shop> resultData = mapper.getPwCheck(param);
+		System.out.println("111111111");
+		if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
+			System.out.println("111111111");
+			param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
+			param.setNewPw(String.valueOf(passwordEncoder.encode(param.getNewPw())));
+			return mapper.updateAccountInfoPw(param);
+		}
+		else {
+			return -1;
+		}
+		
+		
 	}
 }

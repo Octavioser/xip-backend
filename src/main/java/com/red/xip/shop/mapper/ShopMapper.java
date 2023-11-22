@@ -11,4 +11,10 @@ import com.red.xip.shop.model.R_Shop;
 public interface ShopMapper {
 
 	List<R_Shop> selectDetailAccount(P_Shop param) throws Exception;
+	
+	int updateAccountInfoNm(P_Shop param) throws Exception;
+	
+	List<R_Shop> getPwCheck(P_Shop param) throws Exception;
+	
+	int updateAccountInfoPw(P_Shop param) throws Exception;
 }

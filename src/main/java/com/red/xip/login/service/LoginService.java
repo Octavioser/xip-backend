@@ -81,22 +81,6 @@ public class LoginService {
 				
 				
 				param.setAuthCd(resultNum);
-//				String emailContent =
-//			    		"<!DOCTYPE html>\n" +
-//					    "<html lang=\"en\">\n" +
-//					    "<head>\n" +
-//					    "    <meta charset=\"utf-8\">\n" +
-//					    "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n" +
-//					    "    <title>Example HTML Email</title>\n" +
-//					    "</head>\n" +
-//					    "<body style=\"background: red; padding: 30px; height: 100%; text-align: center\">\n" +
-//					    "    <h5 style=\"color: #FFFFFF; font-size: 40px;\">X I P</h5>\n" +
-//					    "    <p></p>\n" +
-//					    "    <p style=\"color: #FFFFFF; font-size: 30px; font-weight: 500\">VERIFICATION CODE</p>\n" +
-//					    "    <p style=\"color: #FFFFFF; font-size: 20px\">" + resultNum + "</p>\n" + 
-//					    "</body>\n" +
-//					    "</html>";
-				// HTML 파일 읽기
 				
 				Context context = new Context();
 		        context.setVariable("resultNum", resultNum);

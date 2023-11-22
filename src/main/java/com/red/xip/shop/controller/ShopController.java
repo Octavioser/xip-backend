@@ -1,5 +1,7 @@
 package com.red.xip.shop.controller;
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -10,12 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.red.xip.common.SecurityConstants;
+import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.service.ShopService;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 @RestController
 @RequestMapping("/shop")
@@ -24,24 +23,25 @@ public class ShopController {
 	@Autowired
 	ShopService service;
 	
-	// 이메일 있는지 체크
+	// C100생성 R000출력 U200갱신 D300삭제
+	// shopDetailAccount
 	@PostMapping("/shopR001")
 	@ResponseBody
 	public Object selectDetailAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
     	try {
-    		String authorizationHeader = servletRequest.getHeader("Authorization");
-    		if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-                return -2;
-            }
-    		String token = authorizationHeader.substring(7); // "Bearer "를 제외한 토큰 부분을 추출합니다.
-    		
-    		Claims claims = Jwts.parserBuilder().setSigningKey(SecurityConstants.JWT_SECRET_KEY).build().parseClaimsJws(token).getBody();
-    		
-            String user_cd = claims.getSubject();              // 유저 번호 꺼내기
-            String email = claims.get("email", String.class);  // 유저 이메일 꺼내기
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
             
-            param.setUserCd(user_cd);
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if((userCd == null || userCd.isEmpty()) && userCd == "-2") {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
             param.setEmail(email);
             
     		return service.selectDetailAccount(param);
@@ -50,4 +50,70 @@ public class ShopController {
 			return -2;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateAccountInfoNm
+	@PostMapping("/shopU201")
+	@ResponseBody
+	public Object updateAccountInfoNm(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
+            
+            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
+    			return -1;
+    		}
+            
+    		return service.updateAccountInfoNm(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+		// updateAccountInfoNm
+		@PostMapping("/shopU202")
+		@ResponseBody
+		public Object updateAccountInfoPw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+			/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+	    	try {
+	    		// 쿠키 정보 갖고오기
+	    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	            
+	    		String userCd = userInfo.get("userCd");
+	    		
+	    		String email = userInfo.get("email");
+	    		
+	    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+	    			return -2;
+	    		}
+	    		
+	            param.setUserCd(userCd);
+	            
+	            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
+	    			return -1;
+	    		}
+	            int result = service.updateAccountInfoPw(param);
+	            
+	            if(result < 1) {
+	            	return -1;
+	            }
+	    		return result;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return -2;  // -1 에러 -2 에러 및 로그아웃
+			}
+		}
 }

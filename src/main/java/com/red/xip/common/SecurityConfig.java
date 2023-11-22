@@ -20,14 +20,14 @@ public class SecurityConfig {
 	
 	@Bean   // spring-boot-starter-security cors 설정하기
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.httpBasic().disable(); //스프링 시큐리티에서 HTTP 기본 인증(Basic Authentication)을 비활성화
+        // http.httpBasic().disable(); //스프링 시큐리티에서 HTTP 기본 인증(Basic Authentication)을 비활성화
         http.csrf().disable(); // 외부 POST 요청을 받아야하니 csrf는 꺼준다.
         http.cors(); // ⭐ CORS를 커스텀하려면 이렇게
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.authorizeHttpRequests()
-                .antMatchers("/**").permitAll()
-                .anyRequest().authenticated();
+//        http.authorizeHttpRequests()
+//                .antMatchers("/**").permitAll()
+//                .anyRequest().authenticated();
 
         return http.build();
     }

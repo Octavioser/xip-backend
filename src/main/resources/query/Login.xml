@@ -43,7 +43,7 @@
 			#{lastNm},
 			#{firstNm},
 			#{gender},
-			'KOR',
+			#{country},
 			NOW(),
 			NOW(),
 			NOW(),
