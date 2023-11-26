@@ -15,4 +15,15 @@ public class P_Shop {
 	private String lastNm;
 	private String pw;
 	private String newPw;
+	
+	private String addFirstNm;
+	private String addLastNm;
+	private String phone;
+	private String company;
+	private String add1;
+	private String add2;
+	private String city;
+	private String addCountry;
+	private String state;
+	private String postalCd;
 }

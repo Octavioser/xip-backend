@@ -37,7 +37,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if((userCd == null || userCd.isEmpty()) && userCd == "-2") {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
     			return -2;
     		}
     		
@@ -82,7 +82,7 @@ public class ShopController {
 		}
 	}
 	
-	// C100생성 R000출력 U200갱신 D300삭제
+		// C100생성 R000출력 U200갱신 D300삭제
 		// updateAccountInfoNm
 		@PostMapping("/shopU202")
 		@ResponseBody
@@ -116,4 +116,41 @@ public class ShopController {
 				return -2;  // -1 에러 -2 에러 및 로그아웃
 			}
 		}
+		
+		// C100생성 R000출력 U200갱신 D300삭제
+				// updateAccountInfoNm
+				@PostMapping("/shopC102")
+				@ResponseBody
+				public Object insertAdd(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+					/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+			    	try {
+			    		// 쿠키 정보 갖고오기
+			    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+			            
+			    		String userCd = userInfo.get("userCd");
+			    		
+			    		String email = userInfo.get("email");
+			    		
+			    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+			    			return -2;
+			    		}
+			    		
+			            param.setUserCd(userCd);
+			            
+			            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
+			    			return -1;
+			    		}
+			            
+			            int result = service.insertAdd(param);
+			            
+			            if(result < 1) {
+			            	return -1;
+			            }
+			            
+			    		return result;
+					} catch (Exception e) {
+						e.printStackTrace();
+						return -2;  // -1 에러 -2 에러 및 로그아웃
+					}
+				}
 }

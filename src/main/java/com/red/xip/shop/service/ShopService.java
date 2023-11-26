@@ -46,4 +46,9 @@ public class ShopService {
 		
 		
 	}
+
+	public int insertAdd(P_Shop param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.insertAdd(param);
+	}
 }

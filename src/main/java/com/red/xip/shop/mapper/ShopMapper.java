@@ -17,4 +17,6 @@ public interface ShopMapper {
 	List<R_Shop> getPwCheck(P_Shop param) throws Exception;
 	
 	int updateAccountInfoPw(P_Shop param) throws Exception;
+	
+	int insertAdd(P_Shop param) throws Exception;
 }

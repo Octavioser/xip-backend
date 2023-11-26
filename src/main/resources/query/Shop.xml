@@ -56,6 +56,53 @@
 		WHERE  EMAIL = #{email}
 		
 	</select>
+	
+	<insert id="insertAdd" 
+		parameterType = "com.red.xip.shop.model.P_Shop">
+	 
+		INSERT INTO ADDRESSES(
+	        USER_CD,
+	        ADD_LAST_NM,
+	        ADD_FIRST_NM,
+	        PHONE,
+	        COMPANY,
+	        ADD_1,
+	        ADD_2,
+	        CITY,
+	        ADD_COUNTRY,
+	        STATE,
+	        POSTAL_CD,
+	        CREAT_DT,
+	        MODIFY_DT
+	    )
+	    VALUES (
+	        CAST(#{userCd}AS UNSIGNED),
+	        #{addLastNm},
+	        #{addFirstNm},
+	        #{phone},
+	        #{company},
+	        #{add1},
+	        #{add2},
+	        #{city},
+	        #{addCountry},
+	        #{state},
+	        #{postalCd},
+	        NOW(),
+	        NOW()
+	    )
+	    ON DUPLICATE KEY UPDATE
+	    ADD_LAST_NM = #{addLastNm},
+        ADD_FIRST_NM = #{addFirstNm},
+        PHONE = #{phone},
+        COMPANY = #{company},
+        ADD_1 = #{add1},
+        ADD_2 = #{add2},
+        CITY = #{city},
+        ADD_COUNTRY = #{addCountry},
+        STATE = #{state},
+        POSTAL_CD = #{postalCd},
+        MODIFY_DT = NOW();
+	</insert>
 
 	
 </mapper>
