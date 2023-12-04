@@ -9,7 +9,6 @@ import lombok.ToString;
 @ToString
 public class R_Login {
 
-	private int status;
 	private String email;
 	private String pw;
 	private String lastNm;

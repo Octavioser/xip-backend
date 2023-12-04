@@ -84,4 +84,75 @@
 		]]>
 	</select>
 	
+	<select id="selectWebAuthItem" 
+		parameterType = "com.red.xip.login.model.P_WebAuth"
+		resultType="com.red.xip.login.model.R_WebAuth">
+		<![CDATA[
+			SELECT M.USER_CD, M.EMAIL, D.WEB_AUTH_ID, D.CHALLENGE, D.PK, D.AAGUID, D.PK_ALGO
+			FROM   XIP_USERS AS M
+			       LEFT OUTER JOIN WEB_AUTHN AS D
+			       ON M.USER_CD = D.USER_CD
+			WHERE  EMAIL = #{email}
+		]]>
+	</select>
+	
+	
+	
+	<update id="updateChallenge" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		<![CDATA[
+			UPDATE WEB_AUTHN
+		   	   SET CHALLENGE = #{challenge}
+			WHERE  USER_CD = CAST(#{userCd}AS UNSIGNED)
+		]]>
+	</update>
+	
+	<update id="updateSaveWebAuth" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		<![CDATA[
+			UPDATE WEB_AUTHN
+		   	   SET WEB_AUTH_ID = #{webAuthId},
+		   	       PK = #{pk},
+		   	       PK_ALGO = #{pkAlgo},
+		   	       AAGUID = #{aaguid}
+			WHERE  USER_CD = CAST(#{userCd}AS UNSIGNED)
+		]]>
+	</update>
+	
+	<update id="createWebAuthnSaveChallenge" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		<selectKey resultType="String" keyProperty="userCd" order="BEFORE">
+	        SELECT USER_CD FROM XIP_USERS WHERE EMAIL = #{email}     
+	    </selectKey>  
+		<![CDATA[
+			INSERT INTO WEB_AUTHN(
+			  USER_CD,
+			  WEB_AUTH_ID,
+			  CHALLENGE,
+			  PK,
+			  PK_ALGO,
+			  AAGUID,
+			  CREAT_DT,
+			  MODIFY_DT
+			)
+			VALUES(
+			  CAST(#{userCd}AS UNSIGNED),
+			  NULL,
+			  #{challenge},
+			  NULL,
+			  NULL,
+			  NULL,
+			  NOW(),
+			  NOW()
+			)
+			ON DUPLICATE KEY UPDATE
+			WEB_AUTH_ID = NULL,
+	        CHALLENGE = #{challenge},
+	        PK = NULL,
+	        PK_ALGO = NULL,
+	        AAGUID = NULL,
+	        MODIFY_DT = NOW();
+		]]>
+	</update>
+	
 </mapper>

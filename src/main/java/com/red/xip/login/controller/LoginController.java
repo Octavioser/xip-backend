@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.red.xip.login.model.P_Login;
+import com.red.xip.login.model.P_WebAuth;
 import com.red.xip.login.service.LoginService;
+import com.red.xip.shop.model.P_Shop;
 
 @RestController
 @RequestMapping("/login")
@@ -75,6 +77,58 @@ public class LoginController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
+		}
+	}
+	
+	// selectWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
+	@PostMapping("/loginR004")
+	@ResponseBody
+	public Object selectWebAuthCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
+    	try {
+    		return service.selectWebAuthCheck(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// selectWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
+	@PostMapping("/loginR005")
+	@ResponseBody
+	public Object selectWebAuthCreateItem(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
+    	try {
+    		return service.selectWebAuthCreateItem(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// updateWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
+	@PostMapping("/loginU201")
+	@ResponseBody
+	public Object updateSaveWebAuth(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
+    	try {
+    		return service.updateSaveWebAuth(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// selectWebAuthLoginCheck  webAuth로 로그인 한거 검증
+	@PostMapping("/loginR006")
+	@ResponseBody
+	public Object selectWebAuthLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
+    	try {
+    		return service.selectWebAuthLoginCheck(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 }

@@ -33,9 +33,7 @@ public class ShopService {
 		
 
 		List<R_Shop> resultData = mapper.getPwCheck(param);
-		System.out.println("111111111");
 		if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
-			System.out.println("111111111");
 			param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
 			param.setNewPw(String.valueOf(passwordEncoder.encode(param.getNewPw())));
 			return mapper.updateAccountInfoPw(param);
