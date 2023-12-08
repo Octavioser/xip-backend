@@ -80,6 +80,17 @@
 			FROM   EMAIL_AUTH_CODE
 			WHERE  EMAIL = REPLACE(#{email},' ','')
 			AND    CODE = #{authCd}
+		]]>
+	</select>
+	
+	<select id="selectEmailAuthCodeTimeCheck" 
+		parameterType = "com.red.xip.login.model.P_Login"
+		resultType="int">
+		<![CDATA[
+			SELECT COUNT(EMAIL)
+			FROM   EMAIL_AUTH_CODE
+			WHERE  EMAIL = REPLACE(#{email},' ','')
+			AND    CODE = #{authCd}
 			AND    DATE_ADD(MODIFY_DT, INTERVAL 3 MINUTE) > NOW()
 		]]>
 	</select>
@@ -119,7 +130,7 @@
 		]]>
 	</update>
 	
-	<update id="createWebAuthnSaveChallenge" 
+	<insert id="createWebAuthnSaveChallenge" 
 		parameterType = "com.red.xip.login.model.P_Login">
 		<selectKey resultType="String" keyProperty="userCd" order="BEFORE">
 	        SELECT USER_CD FROM XIP_USERS WHERE EMAIL = #{email}     
@@ -152,6 +163,27 @@
 	        PK_ALGO = NULL,
 	        AAGUID = NULL,
 	        MODIFY_DT = NOW();
+		]]>
+	</insert>
+	
+	<select id="selectEmailWebAuthCheck" 
+		parameterType = "com.red.xip.login.model.P_WebAuth"
+		resultType="com.red.xip.login.model.R_WebAuth">
+		<![CDATA[
+			SELECT M.EMAIL, D.WEB_AUTH_ID, M.USER_CD
+			FROM   XIP_USERS AS M
+			       LEFT OUTER JOIN WEB_AUTHN AS D
+			       ON M.USER_CD = D.USER_CD
+			WHERE  EMAIL = #{email}
+		]]>
+	</select>
+	
+	<update id="updatePw" 
+		parameterType = "com.red.xip.login.model.P_Login">
+		<![CDATA[
+			UPDATE XIP_USERS
+		   	   SET PW = #{pw}
+			WHERE  EMAIL = #{email}
 		]]>
 	</update>
 	

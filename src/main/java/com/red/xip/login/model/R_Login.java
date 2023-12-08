@@ -15,4 +15,5 @@ public class R_Login {
 	private String token;
 	private String authCd;
 	private String userCd;
+	private String webAuthId;
 }

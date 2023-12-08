@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import com.red.xip.login.model.P_Login;
 import com.red.xip.login.model.P_WebAuth;
 import com.red.xip.login.service.LoginService;
-import com.red.xip.shop.model.P_Shop;
 
 @RestController
 @RequestMapping("/login")
@@ -27,13 +26,6 @@ public class LoginController {
 	public Object getLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-//    		List<R_Login> result = service.getLoginCheck(param);
-//    		Cookie idCookie = new Cookie("memberId", String.valueOf(result.get(0).getId()));
-//    		servletResponse.addCookie(idCookie);
-//    		System.out.println("쿠키 정보 전달 완료 : "+ idCookie);
-//    		HttpSession session = servletRequest.getSession();
-//    		return result;
-//    		System.out.println("쿠키 정보 전달 완료 : "+ String.valueOf(param));
     		return service.getLoginCheck(param);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -44,10 +36,10 @@ public class LoginController {
 	// 이메일 있는지 체크
 	@PostMapping("/loginR002")
 	@ResponseBody
-	public Object selectEmailCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public Object selectEmailCheckAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.selectEmailCheck(param);
+    		return service.selectEmailCheckAuthCode(param);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;
@@ -126,6 +118,45 @@ public class LoginController {
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
     		return service.selectWebAuthLoginCheck(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// 이메일 있는지 체크
+	@PostMapping("/loginR007")
+	@ResponseBody
+	public Object selectEmailCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+			/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
+    	try {
+    		return service.selectEmailCheck(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	// 이메일 있는지 체크
+	@PostMapping("/loginR008")
+	@ResponseBody
+	public Object selectForgotPwAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
+    	try {
+    		return service.selectForgotPwAuthCode(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	// updatePw  비밀번호변경
+	@PostMapping("/loginU202")
+	@ResponseBody
+	public Object updatePw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
+    	try {
+    		return service.updatePw(param);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;  // -1 에러 -2 에러 및 로그아웃

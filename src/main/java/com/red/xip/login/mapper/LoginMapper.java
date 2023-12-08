@@ -32,4 +32,9 @@ public interface LoginMapper {
 
 	int updateChallenge(P_WebAuth param) throws Exception;
 
+	List<R_WebAuth> selectEmailWebAuthCheck(P_WebAuth param) throws Exception;
+
+	int updatePw(P_Login param) throws Exception;
+
+	int selectEmailAuthCodeTimeCheck(P_Login param);
 }

@@ -53,7 +53,6 @@ import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Jwts;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 public class LoginService {
@@ -110,8 +109,8 @@ public class LoginService {
 		}
 	}
 
-	// 이메일 체크
-	public int selectEmailCheck(P_Login param) throws Exception {
+	// 비회원이메일 체크 후 인증코드
+	public int selectEmailCheckAuthCode(P_Login param) throws Exception {
 		try {
 			Random random = new Random();
 			
@@ -137,7 +136,7 @@ public class LoginService {
 		        
 			    String senderEmail = "xipservice@xip.red";
 			    String receiverEmail = param.getEmail();
-			    String emailSubject = "Customer account confirmation";
+			    String emailSubject = "XIP account confirmation";
 				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
 				mapper.insertAuthCd(param);
 			}
@@ -169,7 +168,7 @@ public class LoginService {
 	public int selectEmailAuthCodeCheck(P_Login param) {
 		// TODO Auto-generated method stub
 		try {
-			int count =	mapper.selectEmailAuthCodeCheck(param);
+			int count =	mapper.selectEmailAuthCodeTimeCheck(param); // 제한시간안에 인증코드
 			return count;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -181,31 +180,44 @@ public class LoginService {
 	// 회원가입되어있는지 webAuth등록이 되어있는지 확인 -> 확인되면 생체인증을 위한 값 리턴
 	public List<R_WebAuth> selectWebAuthCheck(P_WebAuth param) throws Exception {
 		// TODO Auto-generated method stub
-		List<R_WebAuth> result = mapper.selectWebAuthItem(param);
-		
-		// 가입입된 이메일이랑 webauth 등록했는지
-		if(!"".equals(CommonUtils.stringIfNull(result.get(0).getEmail())) && 
-				!"".equals(CommonUtils.stringIfNull(result.get(0).getWebAuthId()))	
-		) {
-			SecureRandom random = new SecureRandom();
-	        byte[] bytes = new byte[32]; // 32바이트의 무작위 데이터 생성
-	        random.nextBytes(bytes);
-	     // challange변수 생성
-	        String challenge = Base64.getUrlEncoder().encodeToString(bytes);
-	        result.get(0).setChallenge( challenge); // URL-safe Base64 인코딩
-	        
-	        // 챌린지값 저장
-	        param.setChallenge(challenge);
-	        param.setUserCd(result.get(0).getUserCd()); 
-	        mapper.updateChallenge(param);
+		try {
+			List<R_WebAuth> result = mapper.selectWebAuthItem(param);
+			
+			if(!result.isEmpty() && result.size() > 0) {
+
+				// 가입입된 이메일이랑 webauth 등록했는지
+				if(!"".equals(CommonUtils.stringIfNull(result.get(0).getEmail())) && 
+						!"".equals(CommonUtils.stringIfNull(result.get(0).getWebAuthId()))
+				) {
+					SecureRandom random = new SecureRandom();
+			        byte[] bytes = new byte[32]; // 32바이트의 무작위 데이터 생성
+			        random.nextBytes(bytes);
+			     // challange변수 생성
+			        String challenge = Base64.getUrlEncoder().encodeToString(bytes);
+			        result.get(0).setChallenge( challenge); // URL-safe Base64 인코딩
+			        
+			        // 챌린지값 저장
+			        param.setChallenge(challenge);
+			        param.setUserCd(result.get(0).getUserCd()); 
+			        mapper.updateChallenge(param);
+				}
+				result.get(0).setUserCd(null);
+				result.get(0).setPw(null);
+				result.get(0).setPk(null);
+				result.get(0).setAaguid(null);
+				
+				
+				return result;
+			}
+			else {
+				return Collections.emptyList();
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return Collections.emptyList();
 		}
-		result.get(0).setUserCd(null);
-		result.get(0).setPw(null);
-		result.get(0).setPk(null);
-		result.get(0).setAaguid(null);
 		
-		
-		return result;
 	}
 
 	// 회원인지 확인 후 등록에 필요한 값 리턴
@@ -448,6 +460,109 @@ public class LoginService {
 			e.printStackTrace();
 			return Collections.emptyList();
 		}
+	}
+	
+	// 이메일 체크
+	public List<R_WebAuth> selectEmailCheck(P_WebAuth param) throws Exception {
+		try {
+			
+			List<R_WebAuth> resultData = mapper.selectEmailWebAuthCheck(param);
+			
+			// 회원가입이 되어있느지
+			if(!resultData.isEmpty() && resultData.size() > 0) {
+				
+				// 가입입된 이메일이랑 webauth 등록했는지
+				if(!"".equals(CommonUtils.stringIfNull(resultData.get(0).getEmail())) && 
+						!"".equals(CommonUtils.stringIfNull(resultData.get(0).getWebAuthId()))
+				) 
+				{
+					SecureRandom random = new SecureRandom();
+			        byte[] bytes = new byte[32]; // 32바이트의 무작위 데이터 생성
+			        random.nextBytes(bytes);
+			     // challange변수 생성
+			        String challenge = Base64.getUrlEncoder().encodeToString(bytes);
+			        resultData.get(0).setChallenge( challenge); // URL-safe Base64 인코딩
+			        
+			        // 챌린지값 저장
+			        param.setChallenge(challenge);
+			        param.setUserCd(resultData.get(0).getUserCd());
+			        
+			        resultData.get(0).setUserCd(null);
+			        
+			        mapper.updateChallenge(param);
+				}
+				// 회원가입은 되어있지만 webauth이 등록되지 않은 사용자
+				else if(!"".equals(CommonUtils.stringIfNull(resultData.get(0).getEmail()))){
+					
+				}
+				
+				resultData.get(0).setUserCd(null);
+				return resultData;
+			}
+			else {
+				return Collections.emptyList();
+			}
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	// 비번업데이트 회원인지 체크 후 인증코드
+	public int selectForgotPwAuthCode(P_Login param) throws Exception {
+		try {
+			Random random = new Random();
+			
+			int count = mapper.selectEmailCheck(param);
+			if(count > 0) {
+				int createNum;
+				String ranNum = "";
+				String resultNum = "";
+				for (int i=0; i<6; i++) { 
+					createNum = random.nextInt(9);		//0부터 9까지 올 수 있는 1자리 난수 생성
+					ranNum =  Integer.toString(createNum);  //1자리 난수를 String으로 형변환
+					resultNum += ranNum;			//생성된 난수(문자열)을 원하는 수(letter)만큼 더하며 나열
+				}
+				
+				
+				param.setAuthCd(resultNum);
+				
+				Context context = new Context();
+		        context.setVariable("resultNum", resultNum);
+
+		        // 템플릿 엔진을 사용하여 HTML 컨텐츠 생성
+		        String emailContent = templateEngine.process("emailForGotPwAuthCdTempl", context);
+		        
+			    String senderEmail = "xipservice@xip.red";
+			    String receiverEmail = param.getEmail();
+			    String emailSubject = "XIP reset your password";
+				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
+				mapper.insertAuthCd(param);
+			}
+			return count;
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	public int updatePw(P_Login param) throws Exception {
+		// TODO Auto-generated method stub
+		int checkEmail = mapper.selectEmailCheck(param);
+		if(checkEmail < 1) {
+			// 계정이 있을 경우
+			return -1;
+		}
+		param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
+		int count =	mapper.selectEmailAuthCodeCheck(param);
+		if(count < 1) {
+			return -1;
+		}
+		return mapper.updatePw(param);
 	}
 
 }
