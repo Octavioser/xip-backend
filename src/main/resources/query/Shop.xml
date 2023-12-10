@@ -4,8 +4,8 @@
 <mapper namespace="com.red.xip.shop.mapper.ShopMapper">
 
 	<select id ="selectDetailAccount"
-			parameterType = "com.red.xip.shop.model.P_Shop"
-			resultType="com.red.xip.shop.model.R_Shop">
+			parameterType = "com.red.xip.shop.model.P_Account"
+			resultType="com.red.xip.shop.model.R_Account">
 	<![CDATA[
 		SELECT  IFNULL(M.FIRST_NM, '') AS FIRST_NM,
                 IFNULL(M.LAST_NM, '') AS LAST_NM,
@@ -31,7 +31,7 @@
 	</select>
 	
 	<update id ="updateAccountInfoNm"
-			parameterType = "com.red.xip.shop.model.P_Shop">
+			parameterType = "com.red.xip.shop.model.P_Account">
 		UPDATE  XIP_USERS
 		   SET  LAST_NM = #{lastNm},
 		        FIRST_NM = #{firstNm}
@@ -40,7 +40,7 @@
 	</update>
 	
 	<update id ="updateAccountInfoPw"
-			parameterType = "com.red.xip.shop.model.P_Shop">
+			parameterType = "com.red.xip.shop.model.P_Account">
 		UPDATE  XIP_USERS
 		   SET  PW = #{newPw}
 		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -48,8 +48,8 @@
 	</update>
 	
 	<select id="getPwCheck" 
-		parameterType = "com.red.xip.shop.model.P_Shop"
-		resultType="com.red.xip.shop.model.R_Shop">
+		parameterType = "com.red.xip.shop.model.P_Account"
+		resultType="com.red.xip.shop.model.R_Account">
 	
 		SELECT PW, EMAIL, USER_CD
 		FROM   XIP_USERS
@@ -58,7 +58,7 @@
 	</select>
 	
 	<insert id="insertAdd" 
-		parameterType = "com.red.xip.shop.model.P_Shop">
+		parameterType = "com.red.xip.shop.model.P_Account">
 	 
 		INSERT INTO ADDRESSES(
 	        USER_CD,

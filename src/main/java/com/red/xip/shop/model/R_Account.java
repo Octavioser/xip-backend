@@ -7,17 +7,15 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class P_Shop {
-	
-	private String userCd;
-	private String email;
-	private String firstNm;
+public class R_Account {
+
 	private String lastNm;
-	private String pw;
-	private String newPw;
+	private String firstNm;
+	private String email;
 	
-	private String addFirstNm;
+	private int addCount;
 	private String addLastNm;
+	private String addFirstNm;
 	private String phone;
 	private String company;
 	private String add1;
@@ -26,4 +24,5 @@ public class P_Shop {
 	private String addCountry;
 	private String state;
 	private String postalCd;
+	private String pw;
 }
