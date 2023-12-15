@@ -104,5 +104,40 @@
         MODIFY_DT = NOW();
 	</insert>
 
+	<select id="selectProdList" 
+		parameterType = "com.red.xip.shop.model.P_Shop"
+		resultType="com.red.xip.shop.model.R_Shop">
+	
+		SELECT  PROD_CD,
+		        NAME,
+		        PRICE,
+		        STATUS,
+		        IMAGE_SRC
+		FROM    XIP_PROD
+		WHERE   STATUS != '-1'
+		AND     CASE WHEN IFNULL(#{season},'ALL') = 'ALL' THEN TRUE 
+				ELSE SEASON = #{season} END;
+	</select>
+	
+	<select id="selectDetailProdList" 
+		parameterType = "com.red.xip.shop.model.P_Shop"
+		resultType="com.red.xip.shop.model.R_Shop">
+		<![CDATA[
+			SELECT  M.NAME,
+			        M.PRICE,
+			        M.SIZE_OPT,
+			        M.PROD_DESC,
+			        M.PROD_DESC_D,
+			        D.PROD_CD_D,
+			        D.PROD_SIZE,
+			        CASE WHEN D.SOLD_QT < D.TOTAL_QTY THEN 1 
+			             ELSE 2 END AS PROD_STATUS
+			FROM    XIP_PROD AS M
+			        INNER JOIN XIP_PROD_D AS D
+			        ON D.PROD_CD = M.PROD_CD
+			WHERE   M.PROD_CD = #{prodCd}
+			AND     STATUS != '-1'
+		]]>
+	</select>
 	
 </mapper>

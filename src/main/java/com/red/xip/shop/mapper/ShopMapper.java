@@ -5,7 +5,9 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.red.xip.shop.model.P_Account;
+import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
+import com.red.xip.shop.model.R_Shop;
 
 @Mapper
 public interface ShopMapper {
@@ -19,4 +21,8 @@ public interface ShopMapper {
 	int updateAccountInfoPw(P_Account param) throws Exception;
 	
 	int insertAdd(P_Account param) throws Exception;
+
+	List<R_Shop> selectProdList(P_Shop param) throws Exception;
+
+	List<R_Shop> selectDetailProdList(P_Shop param) throws Exception;
 }

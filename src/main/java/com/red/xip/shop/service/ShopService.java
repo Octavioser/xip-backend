@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.red.xip.shop.model.R_Shop;
 import com.red.xip.shop.mapper.ShopMapper;
 import com.red.xip.shop.model.P_Account;
+import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
 
 @Service
@@ -48,6 +50,16 @@ public class ShopService {
 	public int insertAdd(P_Account param) throws Exception {
 		// TODO Auto-generated method stub
 		return mapper.insertAdd(param);
+	}
+	
+	public List<R_Shop> selectProdList(P_Shop param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.selectProdList(param);
+	}
+
+	public List<R_Shop> selectDetailProdList(P_Shop param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.selectDetailProdList(param);
 	}
 
 }

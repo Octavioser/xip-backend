@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.model.P_Account;
+import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.service.ShopService;
 
 @RestController
@@ -152,5 +153,23 @@ public class ShopController {
 			e.printStackTrace();
 			return -2;  // -1 에러 -2 에러 및 로그아웃
 		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectProdList
+	@PostMapping("/shopR002")
+	@ResponseBody
+	public Object selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+    	return service.selectProdList(param);
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectDetailProdList
+	@PostMapping("/shopR003")
+	@ResponseBody
+	public Object selectDetailProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+    	return service.selectDetailProdList(param);
 	}
 }
