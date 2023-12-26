@@ -130,7 +130,7 @@
 			        M.PROD_DESC_D,
 			        D.PROD_CD_D,
 			        D.PROD_SIZE,
-			        CASE WHEN D.SOLD_QT < D.TOTAL_QTY THEN 1 
+			        CASE WHEN D.SOLD_QTY < D.TOTAL_QTY THEN 1 
 			             ELSE 2 END AS PROD_STATUS
 			FROM    XIP_PROD AS M
 			        INNER JOIN XIP_PROD_D AS D
@@ -138,6 +138,71 @@
 			WHERE   M.PROD_CD = #{prodCd}
 			AND     STATUS != '-1'
 		]]>
+	</select>
+	
+	<insert id="insertCart" 
+		parameterType = "com.red.xip.shop.model.P_Account">
+	 
+		INSERT INTO XIP_CART (
+		    USER_CD,
+		    PROD_CD_D,
+		    PROD_QTY,
+		    CREAT_DT,
+		    MODIFY_DT
+		)
+		VALUES (
+		    CAST(#{userCd}AS UNSIGNED),
+		    #{prodCdD},
+		    1,
+		    NOW(),
+		    NOW()
+		)
+	    ON DUPLICATE KEY UPDATE
+	 	PROD_QTY = PROD_QTY + 1,
+	 	MODIFY_DT = NOW()
+	</insert>
+	
+	<select id="selectCart" 
+		parameterType = "com.red.xip.shop.model.P_Cart"
+		resultType="com.red.xip.shop.model.R_Cart">
+		<![CDATA[
+			SELECT  M.NAME,
+			        M.PRICE,
+			        M.IMAGE_SRC,
+			        D.PROD_SIZE,
+			        C.PROD_QTY,
+			        D.PROD_CD_D    
+			FROM    XIP_CART AS C
+			        INNER JOIN XIP_PROD_D AS D
+			        ON  D.PROD_CD_D = C.PROD_CD_D
+			        AND D.SOLD_QTY < D.TOTAL_QTY
+			        INNER JOIN XIP_PROD AS M
+			        ON  M.PROD_CD = D.PROD_CD
+			        AND M.STATUS != '-1'
+			WHERE   C.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			AND     C.PROD_QTY > 0
+		]]>
+	</select>
+	
+	<update id ="updateCartQty"
+			parameterType = "com.red.xip.shop.model.P_Cart">
+		UPDATE  XIP_CART
+		   SET  PROD_QTY = CASE WHEN #{qtyChangeType} = 'UP' THEN PROD_QTY + 1
+		   						WHEN #{qtyChangeType} = 'DOWN' THEN PROD_QTY -1
+		   						ELSE PROD_QTY END
+		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED)
+		AND     PROD_CD_D= #{prodCdD}
+	</update>
+	
+	<delete id ="deleteCartQty"
+			parameterType = "com.red.xip.shop.model.P_Cart">
+		DELETE FROM XIP_CART WHERE USER_CD = CAST(#{userCd}AS UNSIGNED) AND PROD_CD_D= #{prodCdD};
+	</delete>
+	
+	<select id="selectCartQty" 
+		parameterType = "com.red.xip.shop.model.P_Cart"
+		resultType="int">
+		SELECT TOTAL_QTY - SOLD_QTY FROM XIP_PROD_D WHERE PROD_CD_D= #{prodCdD};
 	</select>
 	
 </mapper>

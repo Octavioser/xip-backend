@@ -7,9 +7,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class P_Shop {
-	String season;
-	String prodCd;
-	String prodCdD;
-	String userCd;
+public class P_Cart {
+
+	private String userCd;
+	private String prodCdD;
+	private String qtyChangeType;
+	private int prodQty;
 }

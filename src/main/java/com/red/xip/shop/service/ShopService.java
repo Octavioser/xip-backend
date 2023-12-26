@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import com.red.xip.shop.model.R_Shop;
 import com.red.xip.shop.mapper.ShopMapper;
 import com.red.xip.shop.model.P_Account;
+import com.red.xip.shop.model.P_Cart;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
+import com.red.xip.shop.model.R_Cart;
 
 @Service
 public class ShopService {
@@ -60,6 +62,32 @@ public class ShopService {
 	public List<R_Shop> selectDetailProdList(P_Shop param) throws Exception {
 		// TODO Auto-generated method stub
 		return mapper.selectDetailProdList(param);
+	}
+
+	// 제품 상세페이지에서 cart에 담을때
+	public int insertCart(P_Shop param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.insertCart(param);
+	}
+
+	public List<R_Cart> selectCart(P_Cart param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.selectCart(param);
+	}
+
+	public int updateCartQty(P_Cart param) throws Exception {
+		// TODO Auto-generated method stub
+		int cartQty = param.getProdQty();
+		if(cartQty == 0) { // 제품 갯수가 0일때는 삭제
+			return mapper.deleteCartQty(param);
+		}
+		else {
+			int availprodQty = mapper.selectCartQty(param);
+			if("UP".equals(param.getQtyChangeType()) && cartQty > availprodQty) { // 재고부족시
+				return -3;
+			}
+			return mapper.updateCartQty(param);
+		}
 	}
 
 }
