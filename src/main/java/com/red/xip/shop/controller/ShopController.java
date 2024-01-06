@@ -262,4 +262,60 @@ public class ShopController {
 			return -2;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// deleteWebauthn
+	@PostMapping("/shopD301")
+	@ResponseBody
+	public Object deleteWebauthn(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
+            
+            return service.deleteWebauthn(param);
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// deleteAccount
+	@PostMapping("/shopD302")
+	@ResponseBody
+	public Object deleteAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
+            
+            return service.deleteAccount(param);
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
 }

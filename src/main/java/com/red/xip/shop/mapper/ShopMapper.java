@@ -37,4 +37,8 @@ public interface ShopMapper {
 	int deleteCartQty(P_Cart param) throws Exception;
 
 	int selectCartQty(P_Cart param) throws Exception;
+
+	int deleteWebauthn(P_Account param) throws Exception;
+
+	int deleteAccount(P_Account param) throws Exception;
 }

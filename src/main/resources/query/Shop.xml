@@ -21,10 +21,15 @@
                 IFNULL(AD.CITY, '') AS CITY,
                 IFNULL(AD.ADD_COUNTRY, '') AS ADD_COUNTRY,
                 IFNULL(AD.STATE, '') AS STATE,
-                IFNULL(AD.POSTAL_CD, '') AS POSTAL_CD
+                IFNULL(AD.POSTAL_CD, '') AS POSTAL_CD,
+                
+                CASE WHEN IFNULL(WEB.WEB_AUTH_ID, '') = '' THEN '0'
+                	 ELSE '1' END AS WEB_AUTH_ID
         FROM    XIP_USERS AS M
                 LEFT OUTER JOIN ADDRESSES AS AD
                 ON  M.USER_CD = AD.USER_CD
+                LEFT OUTER JOIN WEB_AUTHN AS WEB
+                ON  M.USER_CD = WEB.USER_CD
         WHERE   M.USER_CD = CAST(#{userCd}AS UNSIGNED)
         AND     M.EMAIL = #{email}
 	]]>
@@ -204,5 +209,15 @@
 		resultType="int">
 		SELECT TOTAL_QTY - SOLD_QTY FROM XIP_PROD_D WHERE PROD_CD_D= #{prodCdD};
 	</select>
+	
+	<delete id ="deleteWebauthn"
+			parameterType = "com.red.xip.shop.model.P_Account">
+		DELETE FROM WEB_AUTHN WHERE USER_CD = CAST(#{userCd}AS UNSIGNED);
+	</delete>
+	
+	<delete id ="deleteAccount"
+			parameterType = "com.red.xip.shop.model.P_Account">
+		DELETE FROM XIP_USERS WHERE USER_CD = CAST(#{userCd}AS UNSIGNED);
+	</delete>
 	
 </mapper>

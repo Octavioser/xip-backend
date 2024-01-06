@@ -25,4 +25,6 @@ public class R_Account {
 	private String state;
 	private String postalCd;
 	private String pw;
+	
+	private String webAuthId;
 }

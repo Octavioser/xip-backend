@@ -137,7 +137,6 @@ public class LoginController {
 		}
 	}
 	
-	// 이메일 있는지 체크
 	@PostMapping("/loginR008")
 	@ResponseBody
 	public Object selectForgotPwAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,

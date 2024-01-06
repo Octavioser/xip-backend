@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.red.xip.shop.model.R_Shop;
+import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.mapper.ShopMapper;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
@@ -88,6 +89,16 @@ public class ShopService {
 			}
 			return mapper.updateCartQty(param);
 		}
+	}
+
+	public int deleteWebauthn(P_Account param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.deleteWebauthn(param);
+	}
+
+	public int deleteAccount(P_Account param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.deleteAccount(param);
 	}
 
 }
