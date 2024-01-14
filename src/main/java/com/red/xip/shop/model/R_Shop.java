@@ -10,14 +10,15 @@ import lombok.ToString;
 @Setter
 @ToString
 public class R_Shop {
-	String prodCd;
-	String name;
-	BigDecimal price;
-	String Status;
-	String ImageSrc;
-	String prodDesc;
-	String prodDescD;
-	String prodCdD;
-	String prodSize;
-	String prodStatus;
+	private String prodCd;
+	private String name;
+	private BigDecimal price;
+	private String Status;
+	private String ImageSrc;
+	private String prodDesc;
+	private String prodDescD;
+	private String prodCdD;
+	private String prodSize;
+	private String prodStatus;
+	private BigDecimal usPrice;
 }

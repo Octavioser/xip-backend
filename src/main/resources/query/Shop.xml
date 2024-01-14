@@ -115,6 +115,7 @@
 	
 		SELECT  PROD_CD,
 		        NAME,
+		        US_PRICE,
 		        PRICE,
 		        STATUS,
 		        IMAGE_SRC
@@ -130,6 +131,7 @@
 		<![CDATA[
 			SELECT  M.NAME,
 			        M.PRICE,
+			        M.US_PRICE,
 			        M.SIZE_OPT,
 			        M.PROD_DESC,
 			        M.PROD_DESC_D,
@@ -173,6 +175,7 @@
 		<![CDATA[
 			SELECT  M.NAME,
 			        M.PRICE,
+			        M.US_PRICE,
 			        M.IMAGE_SRC,
 			        D.PROD_SIZE,
 			        C.PROD_QTY,
