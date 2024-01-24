@@ -5,6 +5,7 @@ import java.security.SecureRandom;
 import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.X509EncodedKeySpec;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
@@ -87,8 +88,9 @@ public class LoginService {
 				String token = Jwts.builder()
 						.setSubject(resultData.get(0).getUserCd())       // 토큰의 주제 설정 (예: 사용자 ID)
 						.claim("email", resultData.get(0).getEmail())     // 사용자 이메일 추가
+						.claim("roleType", resultData.get(0).getRoleType())     // 사용자 권한추가 'U'
 						.setIssuedAt(now)                                // 토큰 발급일
-//						.setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis())) // 토큰 만료일
+						.setExpiration(new Date(now.getTime() + Duration.ofHours(12).toMillis())) // 토큰 만료일
 					    .signWith(SecurityConstants.JWT_SECRET_KEY) // 서명 알고리즘과 비밀 키 설정
 					    .compact();	
 				resultData.get(0).setToken(token);    // 토큰넣어주기
@@ -205,7 +207,7 @@ public class LoginService {
 				result.get(0).setPw(null);
 				result.get(0).setPk(null);
 				result.get(0).setAaguid(null);
-				
+				result.get(0).setRoleType(null);
 				
 				return result;
 			}
@@ -260,6 +262,7 @@ public class LoginService {
 			result.get(0).setPw(null);
 			result.get(0).setPk(null);
 			result.get(0).setAaguid(null);
+			result.get(0).setRoleType(null);
 
 			return result;
 
@@ -443,8 +446,9 @@ public class LoginService {
 			String token = Jwts.builder()
 					.setSubject(result.get(0).getUserCd())       // 토큰의 주제 설정 (예: 사용자 ID)
 					.claim("email", result.get(0).getEmail())     // 사용자 이메일 추가
+					.claim("roleType", result.get(0).getRoleType())     // 사용자 권한추가
 					.setIssuedAt(now)                                // 토큰 발급일
-//					.setExpiration(new Date(now.getTime() + Duration.ofMinutes(30).toMillis())) // 토큰 만료일
+					.setExpiration(new Date(now.getTime() + Duration.ofHours(12).toMillis())) // 토큰 만료일
 				    .signWith(SecurityConstants.JWT_SECRET_KEY) // 서명 알고리즘과 비밀 키 설정
 				    .compact();	
 			result.get(0).setToken(token);    // 토큰넣어주기
@@ -452,6 +456,11 @@ public class LoginService {
 			result.get(0).setPw(null);
 			result.get(0).setPk(null);
 			result.get(0).setAaguid(null);
+			result.get(0).setRoleType(null);
+			
+			
+			
+			
 			return result;
 			
 

@@ -7,7 +7,7 @@
 		parameterType = "com.red.xip.login.model.P_Login"
 		resultType="com.red.xip.login.model.R_Login">
 	
-		SELECT PW, EMAIL, USER_CD
+		SELECT PW, EMAIL, USER_CD, 'U' AS ROLE_TYPE
 		FROM   XIP_USERS
 		WHERE  EMAIL = #{email}
 		
@@ -99,11 +99,16 @@
 		parameterType = "com.red.xip.login.model.P_WebAuth"
 		resultType="com.red.xip.login.model.R_WebAuth">
 		<![CDATA[
-			SELECT M.USER_CD, M.EMAIL, D.WEB_AUTH_ID, D.CHALLENGE, D.PK, D.AAGUID, D.PK_ALGO
-			FROM   XIP_USERS AS M
-			       LEFT OUTER JOIN WEB_AUTHN AS D
-			       ON M.USER_CD = D.USER_CD
-			WHERE  EMAIL = #{email}
+			SELECT  M.USER_CD, M.EMAIL, D.WEB_AUTH_ID, D.CHALLENGE, D.PK, D.AAGUID, D.PK_ALGO
+					, CASE WHEN IFNULL(X.ROLE_TYPE,'') = '' THEN 'U'
+					       ELSE X.ROLE_TYPE END AS ROLE_TYPE 
+			FROM    XIP_USERS AS M
+			        LEFT OUTER JOIN WEB_AUTHN AS D
+			        ON M.USER_CD = D.USER_CD
+			        LEFT JOIN XIP_INCU AS X
+			        ON  X.USER_CD = M.USER_CD
+			        AND X.EMAIL = M.EMAIL
+			WHERE   M.EMAIL = #{email}
 		]]>
 	</select>
 	

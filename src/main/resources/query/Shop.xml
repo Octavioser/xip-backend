@@ -223,4 +223,27 @@
 		DELETE FROM XIP_USERS WHERE USER_CD = CAST(#{userCd}AS UNSIGNED);
 	</delete>
 	
+	<select id="selectOrder" 
+		parameterType = "com.red.xip.shop.model.P_Order"
+		resultType="com.red.xip.shop.model.R_Order">
+		
+		SELECT  CONCAT (DATE_FORMAT(ORDER_DT, '%b' ), ' ', 
+						DATE_FORMAT(ORDER_DT, '%e' ), ', ', 
+						DATE_FORMAT(ORDER_DT, '%Y') ) AS ORDER_DT,
+		        CASE ORDER_STATUS 
+		             WHEN '1' THEN 'PURCHASED'
+		             WHEN '2' THEN 'SHIPPED'
+		             WHEN '3' THEN 'SHIPPED'
+		             WHEN '0' THEN 'CANCELLING'
+		             WHEN '-1' THEN 'CANCELLED'
+		             ELSE '' END AS ORDER_STATUS,
+		        ORDER_CD,
+		        CASE CURRENCY
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
+		             ELSE '' END AS TOTAL_AMOUNT
+		FROM    XIP_ORDER AS M
+		WHERE   USER_CD = #{userCd}
+	</select>
+	
 </mapper>

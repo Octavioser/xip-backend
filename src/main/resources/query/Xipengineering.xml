@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.red.xip.xipengineering.mapper.XipengineeringMapper">
+
+	<select id="selectUsers" 
+		parameterType = "com.red.xip.xipengineering.model.P_User"
+		resultType="com.red.xip.xipengineering.model.R_User">
+		<![CDATA[
+			SELECT  M.LAST_NM,
+			        M.FIRST_NM,
+			        M.EMAIL,
+			        DATE_FORMAT(M.CREAT_DT, '%y%m%d') AS CREAT_DT
+			FROM    XIP_USERS AS M
+			        LEFT JOIN XIP_INCU AS X
+			        ON  X.USER_CD = #{userCd}
+			        AND X.EMAIL = #{email}
+			WHERE   X.USER_CD= #{userCd}
+			AND     ( IFNULL(#{name}, '') = '' OR 
+					M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
+					M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
+			AND     M.CREAT_DT > #{fromDt}
+			AND     M.CREAT_DT < #{toDt}
+			ORDER BY  M.CREAT_DT DESC
+		]]>
+	</select>
+	
+</mapper>

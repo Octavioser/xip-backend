@@ -6,9 +6,11 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
+import com.red.xip.shop.model.P_Order;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
 import com.red.xip.shop.model.R_Cart;
+import com.red.xip.shop.model.R_Order;
 import com.red.xip.shop.model.R_Shop;
 
 @Mapper
@@ -41,4 +43,6 @@ public interface ShopMapper {
 	int deleteWebauthn(P_Account param) throws Exception;
 
 	int deleteAccount(P_Account param) throws Exception;
+
+	List<R_Order> selectOrder(P_Order param) throws Exception;
 }

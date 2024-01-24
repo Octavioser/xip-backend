@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
+import com.red.xip.shop.model.P_Order;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.service.ShopService;
 
@@ -39,7 +40,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -67,7 +68,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -98,7 +99,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -133,7 +134,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -188,7 +189,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -221,7 +222,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -249,7 +250,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -277,7 +278,7 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
@@ -305,13 +306,41 @@ public class ShopController {
     		
     		String email = userInfo.get("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email)) || "-2".equals(CommonUtils.stringIfNull(userCd))) {
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return -2;
     		}
     		
             param.setUserCd(userCd);
             
             return service.deleteAccount(param);
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectCart
+	@PostMapping("/shopR005")
+	@ResponseBody
+	public Object selectOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Order param) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
+            
+            return service.selectOrder(param);
             
 		} catch (Exception e) {
 			e.printStackTrace();

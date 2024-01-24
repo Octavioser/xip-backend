@@ -16,4 +16,5 @@ public class R_Login {
 	private String authCd;
 	private String userCd;
 	private String webAuthId;
+	private String roleType;
 }

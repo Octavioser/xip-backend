@@ -7,13 +7,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.red.xip.shop.model.R_Shop;
-import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.mapper.ShopMapper;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
+import com.red.xip.shop.model.P_Order;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
 import com.red.xip.shop.model.R_Cart;
+import com.red.xip.shop.model.R_Order;
 
 @Service
 public class ShopService {
@@ -79,7 +80,7 @@ public class ShopService {
 	public int updateCartQty(P_Cart param) throws Exception {
 		// TODO Auto-generated method stub
 		int cartQty = param.getProdQty();
-		if(cartQty == 0) { // 제품 갯수가 0일때는 삭제
+		if(cartQty < 1) { // 제품 갯수가 0일때는 삭제
 			return mapper.deleteCartQty(param);
 		}
 		else {
@@ -99,6 +100,11 @@ public class ShopService {
 	public int deleteAccount(P_Account param) throws Exception {
 		// TODO Auto-generated method stub
 		return mapper.deleteAccount(param);
+	}
+
+	public List<R_Order> selectOrder(P_Order param) throws Exception {
+		// TODO Auto-generated method stub
+		return mapper.selectOrder(param);
 	}
 
 }
