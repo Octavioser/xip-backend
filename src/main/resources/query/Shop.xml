@@ -138,10 +138,13 @@
 			        D.PROD_CD_D,
 			        D.PROD_SIZE,
 			        CASE WHEN D.SOLD_QTY < D.TOTAL_QTY THEN 1 
-			             ELSE 2 END AS PROD_STATUS
+			             ELSE 2 END AS PROD_STATUS,
+			        IMG.IMG_SRC
 			FROM    XIP_PROD AS M
 			        INNER JOIN XIP_PROD_D AS D
 			        ON D.PROD_CD = M.PROD_CD
+			        LEFT OUTER JOIN XIP_IMAGE AS IMG
+			        ON  IMG.IMAGE_CD = M.PROD_CD
 			WHERE   M.PROD_CD = #{prodCd}
 			AND     STATUS != '-1'
 		]]>
@@ -244,6 +247,75 @@
 		             ELSE '' END AS TOTAL_AMOUNT
 		FROM    XIP_ORDER AS M
 		WHERE   USER_CD = #{userCd}
+		ORDER BY ORDER_DT DESC;
+	</select> 
+
+	<select id="selectOrderDetails" 
+		parameterType = "com.red.xip.shop.model.P_OrderD"
+		resultType="com.red.xip.shop.model.R_OrderD">
+		
+		SELECT  CONCAT (DATE_FORMAT(ORDER_DT, '%b' ), ' ', 
+						DATE_FORMAT(ORDER_DT, '%e' ), ', ', 
+						DATE_FORMAT(ORDER_DT, '%Y') ) AS ORDER_DT,
+		        CASE ORDER_STATUS 
+		             WHEN '1' THEN 'PURCHASED'
+		             WHEN '2' THEN 'SHIPPED'
+		             WHEN '3' THEN 'SHIPPED'
+		             WHEN '0' THEN 'CANCELLING'
+		             WHEN '-1' THEN 'CANCELLED'
+		             ELSE '' END AS ORDER_STATUS,
+		        ORDER_CD,
+		        SHIPPING_METHOD,
+		        PAY_METHOD,
+		        ADD_LAST_NM,
+		        ADD_FIRST_NM,
+		        PHONE      ,
+		        COMPANY,
+		        ADD_1,
+		        ADD_2,
+		        CITY,
+		        ADD_COUNTRY,
+		        STATE,
+		        POSTAL_CD,
+		        CASE CURRENCY
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
+		             ELSE '' END AS TOTAL_AMOUNT,
+		        CASE CURRENCY
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(SHIPPING_AMOUNT,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(SHIPPING_AMOUNT,0) )    
+		             ELSE '' END AS SHIPPING_AMOUNT,
+		        CASE CURRENCY
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
+		             ELSE '' END AS SUBTOTAL
+		FROM    XIP_ORDER AS M
+		WHERE   ORDER_CD = #{orderCd}
+		AND     USER_CD = #{userCd}
+	</select>
+	
+	<select id="selectOrderDetailProducts" 
+		parameterType = "com.red.xip.shop.model.P_OrderD"
+		resultType="com.red.xip.shop.model.orderDetails">
+		
+		SELECT  PD.PROD_CD_D,
+				P.IMAGE_SRC, 
+		        P.NAME, 
+		        PD.PROD_SIZE, 
+		        D.PROD_QTY,
+		        CASE CURRENCY
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(P.PRICE * D.PROD_QTY,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(P.PRICE * D.PROD_QTY,0) )    
+		             ELSE '' END AS PROD_PRICE
+		FROM    XIP_ORDER_D AS D 
+		        INNER JOIN XIP_ORDER AS M
+		        ON  M.ORDER_CD = D.ORDER_CD
+		        LEFT OUTER JOIN XIP_PROD_D AS PD
+		        ON  PD.PROD_CD_D = D.PROD_CD_D
+		        LEFT OUTER JOIN XIP_PROD AS P
+		        ON  P.PROD_CD = PD.PROD_CD
+		WHERE   M.USER_CD = #{userCd}
+		AND     D.ORDER_CD = #{orderCd}
 	</select>
 	
 </mapper>

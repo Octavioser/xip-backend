@@ -21,4 +21,5 @@ public class R_Shop {
 	private String prodSize;
 	private String prodStatus;
 	private BigDecimal usPrice;
+	private String imgSrc;
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.red.xip.main.mapper.MainMapper">
+
+	<select id="selectImages" 
+		parameterType = "com.red.xip.main.model.P_Imges"
+		resultType="com.red.xip.main.model.R_Imges">
+	
+		SELECT  IMG_SRC 
+		FROM    XIP_IMAGE
+		WHERE   IMAGE_CD = #{imageCd}
+		
+	</select>
+</mapper>

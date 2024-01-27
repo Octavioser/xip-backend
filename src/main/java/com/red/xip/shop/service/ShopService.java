@@ -1,5 +1,6 @@
 package com.red.xip.shop.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,14 +8,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.red.xip.shop.model.R_Shop;
+import com.red.xip.shop.model.orderDetails;
 import com.red.xip.shop.mapper.ShopMapper;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
 import com.red.xip.shop.model.P_Order;
+import com.red.xip.shop.model.P_OrderD;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
 import com.red.xip.shop.model.R_Cart;
 import com.red.xip.shop.model.R_Order;
+import com.red.xip.shop.model.R_OrderD;
 
 @Service
 public class ShopService {
@@ -105,6 +109,19 @@ public class ShopService {
 	public List<R_Order> selectOrder(P_Order param) throws Exception {
 		// TODO Auto-generated method stub
 		return mapper.selectOrder(param);
+	}
+
+	public List<R_OrderD> selectOrderDetails(P_OrderD param) throws Exception {
+		// TODO Auto-generated method stub
+		List<orderDetails> list =  mapper.selectOrderDetailProducts(param);
+		List<R_OrderD> result = mapper.selectOrderDetails(param);
+		if(list.size() > 0 && result.size() > 0) {
+			result.get(0).setOrderDetails(list);
+			return result;
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 }
