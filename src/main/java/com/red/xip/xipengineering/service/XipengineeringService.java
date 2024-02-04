@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.red.xip.xipengineering.mapper.XipengineeringMapper;
+import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_User;
+import com.red.xip.xipengineering.model.R_Orders;
 import com.red.xip.xipengineering.model.R_User;
 
 @Service
@@ -24,6 +26,15 @@ public class XipengineeringService {
 		} catch (Exception e) {
 			return Collections.emptyList();
 			// TODO: handle exception
+		}
+	}
+
+	public List<R_Orders> selectOrders(P_Orders param) throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectOrders(param);
+		} catch (Exception e) {
+			return Collections.emptyList();
 		}
 	}
 

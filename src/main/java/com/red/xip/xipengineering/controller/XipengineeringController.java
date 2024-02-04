@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.red.xip.common.CommonUtils;
+import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_User;
 import com.red.xip.xipengineering.model.P_XLogin;
 import com.red.xip.xipengineering.service.XipengineeringService;
@@ -59,7 +60,7 @@ public class XipengineeringController {
 	}
 	
 	// C100생성 R000출력 U200갱신 D300삭제
-	// selectUsers  권한페이지 처음 로그인
+	// selectUsers  회원조회
 	@PostMapping("/incuR002")
 	@ResponseBody
 	public Object selectUsers(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
@@ -86,6 +87,40 @@ public class XipengineeringController {
 			param.setUserCd(userCd);
 			
 			return service.selectUsers(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectOrders  주문내역조회
+	@PostMapping("/incuR003")
+	@ResponseBody
+	public Object selectOrders(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Orders param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.selectOrders(param);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -2;  // -1 에러 -2 에러 및 로그아웃

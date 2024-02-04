@@ -23,6 +23,41 @@
 			AND     M.CREAT_DT < #{toDt}
 			ORDER BY  M.CREAT_DT DESC
 		]]>
+	</select>  
+	
+	<select id="selectOrders" 
+		parameterType = "com.red.xip.xipengineering.model.P_Orders"
+		resultType="com.red.xip.xipengineering.model.R_Orders">
+		<![CDATA[
+			SELECT  M.ORDER_CD,
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
+			        CASE M.ORDER_STATUS 
+			             WHEN '1' THEN '배송전'
+			             WHEN '2' THEN '배송후'
+			             WHEN '3' THEN '배송완료'
+			             WHEN '0' THEN '취소요청'
+			             WHEN '-1'THEN '취소완료' END AS ORDER_STATUS,
+			        CASE WHEN CURRENCY = 'KRW' THEN TOTAL_AMOUNT 
+			             ELSE '' END  AS KRW_TOTAL_AMOUNT,
+			        CASE WHEN CURRENCY = 'KRW' THEN SHIPPING_AMOUNT 
+			             ELSE '' END  AS KRW_SHIPPING_AMOUNT,
+			        CASE WHEN CURRENCY = 'KRW' THEN TOTAL_AMOUNT - SHIPPING_AMOUNT 
+			             ELSE '' END  AS KRW_SUB_TOTAL,
+			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			             ELSE '' END  AS USD_TOTAL_AMOUNT,
+			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			             ELSE '' END  AS USD_SHIPPING_AMOUNT,
+			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			             ELSE '' END  AS USD_SUB_TOTAL
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = #{userCd}
+			        AND X.EMAIL = #{email}
+			WHERE   CASE WHEN #{orderStatus} = '' THEN TRUE
+					     ELSE M.ORDER_STATUS = #{orderStatus} END
+			AND     M.ORDER_DT > #{fromDt}
+			AND     M.ORDER_DT < #{toDt}
+		]]>
 	</select>
 	
 </mapper>

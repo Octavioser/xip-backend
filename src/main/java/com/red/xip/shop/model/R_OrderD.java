@@ -33,5 +33,5 @@ public class R_OrderD {
 	
 	private String totalAmount;
 	private String shippingAmount;
-	private String subtotal;
+	private String subTotal;
 }
