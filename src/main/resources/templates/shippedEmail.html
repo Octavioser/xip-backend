@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Email</title>
+</head>
+<body style="background-color: #FFFFFF; color: red; text-align: center; font-family: 'Roboto', sans-serif;">
+	<div style="background-color: #FFFFFF; text-align: center;">
+	    <!-- 이미지 -->
+	    <img th:src="@{https://xip-bucket.s3.ap-northeast-2.amazonaws.com/xItem/i/login/xiptwWhiteLogo.webp}" style="background-color: #FFFFFF; width: 200px;" /><br/><br/> 
+		
+		<div style="height: 10px;"></div>
+		
+	    <!-- 내용 -->
+	    <div class="content" style="text-align: center; color: red; font-weight: 800; font-size: 10px;">
+	        <p>
+		        Your shipping confirmation is below.<br/>  
+		        Thank you again for your business.<br/>
+	        </p>
+	        <div>
+			    <h2 style="display: inline-block; margin-right: 10px;">Your Shipment</h2>
+			    <h2 style="display: inline-block; font-size: 20px;" th:text="'#' + ${trackingNum}"></h2>
+			</div>
+			<div>
+			    <h2 style="display: inline-block; margin-right: 10px;">For Order</h2>
+			    <h2 style="display: inline-block; font-size: 20px;" th:text="'#' + ${orderCd}"></h2>
+			</div>
+	    </div><br/> 
+	
+	    <!-- 링크 -->
+	    <a href="http://www.xip.red" class="link" style="color: red; text-decoration: none; font-weight: 800; font-size: 15px;">www.xip.red</a>
+	</div>
+</body>
+</html>

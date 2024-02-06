@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.red.xip.common.CommonUtils;
 import com.red.xip.xipengineering.model.P_Orders;
+import com.red.xip.xipengineering.model.P_PurchaseOrders;
+import com.red.xip.xipengineering.model.P_Tracking;
 import com.red.xip.xipengineering.model.P_User;
 import com.red.xip.xipengineering.model.P_XLogin;
 import com.red.xip.xipengineering.service.XipengineeringService;
@@ -121,6 +123,108 @@ public class XipengineeringController {
 			param.setEmail(email);
 			
 			return service.selectOrders(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectPurchaseOrder  운송장 등록을 위한 주문내역
+	@PostMapping("/incuR004")
+	@ResponseBody
+	public Object selectPurchaseOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_PurchaseOrders param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.selectPurchaseOrder(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectTrackingInfo  운송장 등록 다이얼로그
+	@PostMapping("/incuR005")
+	@ResponseBody
+	public Object selectTracking(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.selectTracking(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateTrackingNum  운송장 등록 다이얼로그
+	@PostMapping("/incuU001")
+	@ResponseBody
+	public Object updateTrackingNum (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.updateTrackingNum(param);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -2;  // -1 에러 -2 에러 및 로그아웃

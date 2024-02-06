@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.red.xip.common.CommonUtils;
-import com.red.xip.main.mapper.MainMapper;
 import com.red.xip.main.model.P_Imges;
 import com.red.xip.main.service.MainService;
 

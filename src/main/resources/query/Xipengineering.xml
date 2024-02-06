@@ -12,13 +12,12 @@
 			        M.EMAIL,
 			        DATE_FORMAT(M.CREAT_DT, '%y%m%d') AS CREAT_DT
 			FROM    XIP_USERS AS M
-			        LEFT JOIN XIP_INCU AS X
-			        ON  X.USER_CD = #{userCd}
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			WHERE   X.USER_CD= #{userCd}
-			AND     ( IFNULL(#{name}, '') = '' OR 
-					M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
-					M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
+			WHERE   ( IFNULL(#{name}, '') = '' OR 
+						M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
+						M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
 			AND     M.CREAT_DT > #{fromDt}
 			AND     M.CREAT_DT < #{toDt}
 			ORDER BY  M.CREAT_DT DESC
@@ -51,12 +50,108 @@
 			             ELSE '' END  AS USD_SUB_TOTAL
 			FROM    XIP_ORDER AS M
 			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = #{userCd}
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
 			WHERE   CASE WHEN #{orderStatus} = '' THEN TRUE
 					     ELSE M.ORDER_STATUS = #{orderStatus} END
 			AND     M.ORDER_DT > #{fromDt}
 			AND     M.ORDER_DT < #{toDt}
+			ORDER BY  M.CREAT_DT DESC
+		]]>
+	</select>
+	
+	<select id="selectPurchaseOrder" 
+		parameterType = "com.red.xip.xipengineering.model.P_PurchaseOrders"
+		resultType="com.red.xip.xipengineering.model.R_PurchaseOrders">
+		<![CDATA[
+			SELECT  M.ORDER_CD,
+			        CONCAT(U.LAST_NM, ' ', U.FIRST_NM) AS USER_NM,
+			        U.EMAIL,
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
+			        '운송장 등록' AS TRACKING_INPUT
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_USERS AS U
+			        ON  U.USER_CD = M.USER_CD
+			WHERE   M.ORDER_STATUS = #{orderStatus}
+			AND     M.ORDER_DT > #{fromDt}
+			AND     M.ORDER_DT < #{toDt}
+			ORDER BY  M.CREAT_DT DESC
+		]]>
+	</select>
+	
+	<select id="selectTrackingAdd" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
+		resultType="com.red.xip.xipengineering.model.R_Tracking">
+		<![CDATA[
+			SELECT  M.SHIPPING_METHOD,
+			        M.ADD_LAST_NM,
+			        M.ADD_FIRST_NM,
+			        M.PHONE,
+			        IFNULL(M.COMPANY,'') AS COMPANY,
+			        M.ADD_1,
+			        M.ADD_2,
+			        M.CITY,
+			        M.ADD_COUNTRY,
+			        M.STATE,
+			        M.POSTAL_CD,
+			        IFNULL(M.TRACKING_NUM, '') AS TRACKING_NUM
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<select id="selectTrackingProd" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
+		resultType="com.red.xip.xipengineering.model.TrackingProd">
+		<![CDATA[
+			SELECT  D.PROD_CD_D,
+			        P.NAME,
+			        PD.PROD_SIZE,
+			        D.PROD_QTY
+			FROM    XIP_ORDER_D AS D
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_PROD_D AS PD
+			        ON  PD.PROD_CD_D = D.PROD_CD_D
+			        LEFT OUTER JOIN XIP_PROD AS P
+			        ON  P.PROD_CD = PD.PROD_CD
+			WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<update id="updateTrackingNum" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking">
+		<![CDATA[
+			UPDATE  XIP_ORDER AS M
+					INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			   SET  M.TRACKING_NUM = #{trackingNum},
+			        M.ORDER_STATUS='2',
+			        M.SHIP_DT = NOW()
+			WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</update>
+	
+	<select id="selectShipped" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
+		resultType="com.red.xip.xipengineering.model.R_Shipped">
+		<![CDATA[
+			SELECT  U.EMAIL
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_USERS AS U
+			        ON  U.USER_CD = M.USER_CD
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</select>
 	
