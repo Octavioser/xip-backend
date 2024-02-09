@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -16,7 +17,8 @@ import com.red.xip.xipengineering.model.P_Tracking;
 import com.red.xip.xipengineering.model.P_User;
 import com.red.xip.xipengineering.model.R_Orders;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
-import com.red.xip.xipengineering.model.R_Shipped;
+import com.red.xip.xipengineering.model.R_ShipDetails;
+import com.red.xip.xipengineering.model.R_ShipInfo;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 
@@ -76,23 +78,31 @@ public class XipengineeringService {
 		}
 	}
 
+	@Transactional
 	public int updateTrackingNum(P_Tracking param) throws Exception{
 		// TODO Auto-generated method stub
 		try {
 			int result = mapper.updateTrackingNum(param); 
 			
-			List<R_Shipped> shipItem = mapper.selectShipped(param);
+			if(result == 1) {
+				R_ShipInfo shipItem = mapper.selectShipInfo(param);
+				
+				List<R_ShipDetails> detailItem = mapper.selectShipDetails(param);
+				
+				String shipEmail = mapper.selectShipEmail(param);
+				
+				Context context = new Context();
+				context.setVariable("shippInfo", shipItem);
+				context.setVariable("shipDetails", detailItem);
+		        // 템플릿 엔진을 사용하여 HTML 컨텐츠 생성
+		        String emailContent = templateEngine.process("shippedEmail", context);
+		        
+			    String senderEmail = "xipservice@xip.red";
+			    String receiverEmail = shipEmail;
+			    String emailSubject = "xip.red your order has been shipped";
+				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
+			}
 			
-			Context context = new Context();
-	        context.setVariable("trackingNum", param.getTrackingNum());
-	        context.setVariable("orderCd", param.getOrderCd());
-	        // 템플릿 엔진을 사용하여 HTML 컨텐츠 생성
-	        String emailContent = templateEngine.process("shippedEmail", context);
-	        
-		    String senderEmail = "xipservice@xip.red";
-		    String receiverEmail = shipItem.get(0).getEmail();
-		    String emailSubject = "Your Contact Left order has shipped";
-			awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();

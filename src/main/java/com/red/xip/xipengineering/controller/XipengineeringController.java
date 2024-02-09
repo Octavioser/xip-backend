@@ -199,7 +199,7 @@ public class XipengineeringController {
 	
 	// C100생성 R000출력 U200갱신 D300삭제
 	// updateTrackingNum  운송장 등록 다이얼로그
-	@PostMapping("/incuU001")
+	@PostMapping("/incuU201")
 	@ResponseBody
 	public Object updateTrackingNum (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {

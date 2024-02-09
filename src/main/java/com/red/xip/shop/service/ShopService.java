@@ -124,4 +124,15 @@ public class ShopService {
 		}
 	}
 
+	public int updateCancleOrder(P_OrderD param) throws Exception {
+		// TODO Auto-generated method stub
+		try {
+			return mapper.updateCancleOrder(param);
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
 }

@@ -376,4 +376,32 @@ public class ShopController {
 			return -2;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateCartQty
+	@PostMapping("/shopU204")
+	@ResponseBody
+	public Object updateCancleOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+    			return -2;
+    		}
+    		
+            param.setUserCd(userCd);
+            
+            return service.updateCancleOrder(param);
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -2;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
 }

@@ -52,4 +52,6 @@ public interface ShopMapper {
 	List<R_OrderD> selectOrderDetails(P_OrderD param) throws Exception;
 
 	List<orderDetails> selectOrderDetailProducts(P_OrderD param) throws Exception;
+
+	int updateCancleOrder(P_OrderD param) throws Exception;
 }

@@ -246,7 +246,7 @@
 		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
 		             ELSE '' END AS TOTAL_AMOUNT
 		FROM    XIP_ORDER AS M
-		WHERE   USER_CD = #{userCd}
+		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED)
 		ORDER BY ORDER_DT DESC;
 	</select> 
 
@@ -290,8 +290,8 @@
 		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
 		             ELSE '' END AS SUB_TOTAL
 		FROM    XIP_ORDER AS M
-		WHERE   ORDER_CD = #{orderCd}
-		AND     USER_CD = #{userCd}
+		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
 	</select>
 	
 	<select id="selectOrderDetailProducts" 
@@ -314,8 +314,17 @@
 		        ON  PD.PROD_CD_D = D.PROD_CD_D
 		        LEFT OUTER JOIN XIP_PROD AS P
 		        ON  P.PROD_CD = PD.PROD_CD
-		WHERE   M.USER_CD = #{userCd}
-		AND     D.ORDER_CD = #{orderCd}
-	</select>
+		WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		AND     M.USER_CD = CAST(#{userCd}AS UNSIGNED)
+	</select> 
+	
+	<update id ="updateCancleOrder"
+			parameterType = "com.red.xip.shop.model.P_OrderD">
+		UPDATE  XIP_ORDER
+		   SET  ORDER_STATUS = '0'
+		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
+		AND     ORDER_STATUS = '1'
+	</update>
 	
 </mapper>

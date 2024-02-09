@@ -11,7 +11,8 @@ import com.red.xip.xipengineering.model.P_Tracking;
 import com.red.xip.xipengineering.model.P_User;
 import com.red.xip.xipengineering.model.R_Orders;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
-import com.red.xip.xipengineering.model.R_Shipped;
+import com.red.xip.xipengineering.model.R_ShipDetails;
+import com.red.xip.xipengineering.model.R_ShipInfo;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 import com.red.xip.xipengineering.model.TrackingProd;
@@ -32,5 +33,9 @@ public interface XipengineeringMapper {
 
 	int updateTrackingNum(P_Tracking param) throws Exception;
 
-	List<R_Shipped> selectShipped(P_Tracking param) throws Exception;
+	R_ShipInfo selectShipInfo(P_Tracking param) throws Exception;
+
+	String selectShipEmail(P_Tracking param) throws Exception;
+
+	List<R_ShipDetails> selectShipDetails(P_Tracking param) throws Exception;
 }

@@ -140,9 +140,40 @@
 		]]>
 	</update>
 	
-	<select id="selectShipped" 
+	<select id="selectShipInfo" 
 		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
-		resultType="com.red.xip.xipengineering.model.R_Shipped">
+		resultType="com.red.xip.xipengineering.model.R_ShipInfo">
+		<![CDATA[
+			SELECT  M.ORDER_CD,
+			        M.SHIPPING_METHOD,
+			        M.TRACKING_NUM,
+			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
+			        M.ADD_1,
+			        M.ADD_2,
+			        CONCAT(M.CITY,', ', M.STATE, ', ', M.POSTAL_CD, ', ', M.ADD_COUNTRY) AS CITY_POSTAL,
+			        CASE CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
+			             ELSE '' END AS TOTAL_AMOUNT,
+			        CASE CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(SHIPPING_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(SHIPPING_AMOUNT,0) )    
+			             ELSE '' END AS SHIPPING_AMOUNT,
+			        CASE CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
+			             ELSE '' END AS SUB_TOTAL
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<select id="selectShipEmail" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
+		resultType="String">
 		<![CDATA[
 			SELECT  U.EMAIL
 			FROM    XIP_ORDER AS M
@@ -151,6 +182,25 @@
 			        AND X.EMAIL = #{email}
 			        LEFT OUTER JOIN XIP_USERS AS U
 			        ON  U.USER_CD = M.USER_CD
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<select id="selectShipDetails" 
+		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
+		resultType="com.red.xip.xipengineering.model.R_ShipDetails">
+		<![CDATA[	
+			SELECT  P.NAME,
+			        CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
+			        CONCAT('Amount: ', M.PROD_QTY) AS PROD_QTY
+			FROM    XIP_ORDER_D AS M
+			        INNER JOIN XIP_INCU AS X 
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_PROD_D AS PD 
+			        ON  PD.PROD_CD_D = M.PROD_CD_D
+			        LEFT OUTER JOIN XIP_PROD AS P
+			        ON  P.PROD_CD = PD.PROD_CD
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</select>

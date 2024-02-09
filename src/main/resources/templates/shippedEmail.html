@@ -1,34 +1,122 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Verification Email</title>
+  <meta charset="UTF-8">
+  <title>shipping Email</title>
+  <style>
+    body { 
+      background-color: #FFFFFF; 
+      font-family: 'Roboto', sans-serif; 
+      margin: 0; 
+      padding: 0;
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      color: red;
+    }
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      color: red;
+    }
+    .shipping-confirmation {
+      background: #FFFFFF;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 450px;
+      color: red;
+    }
+    .shipping-confirmation table {
+      width: 100%;
+      table-layout: fixed; /* 테이블 너비 고정 */
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .shipping-confirmation th, .shipping-confirmation td {
+      border: none;
+      word-wrap: break-word; /* 긴 텍스트 줄바꿈 */
+      text-align: left;
+      padding: 8px 0;
+    }
+    .shipping-confirmation th {
+      padding-right: 15px;
+      text-transform: uppercase;
+      color: red;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: red;
+    }
+    hr {
+      border: 0;
+      height: 1px;
+      background: red;
+    }
+  </style>
 </head>
-<body style="background-color: #FFFFFF; color: red; text-align: center; font-family: 'Roboto', sans-serif;">
-	<div style="background-color: #FFFFFF; text-align: center;">
-	    <!-- 이미지 -->
-	    <img th:src="@{https://xip-bucket.s3.ap-northeast-2.amazonaws.com/xItem/i/login/xiptwWhiteLogo.webp}" style="background-color: #FFFFFF; width: 200px;" /><br/><br/> 
-		
-		<div style="height: 10px;"></div>
-		
-	    <!-- 내용 -->
-	    <div class="content" style="text-align: center; color: red; font-weight: 800; font-size: 10px;">
-	        <p>
-		        Your shipping confirmation is below.<br/>  
-		        Thank you again for your business.<br/>
-	        </p>
-	        <div>
-			    <h2 style="display: inline-block; margin-right: 10px;">Your Shipment</h2>
-			    <h2 style="display: inline-block; font-size: 20px;" th:text="'#' + ${trackingNum}"></h2>
-			</div>
-			<div>
-			    <h2 style="display: inline-block; margin-right: 10px;">For Order</h2>
-			    <h2 style="display: inline-block; font-size: 20px;" th:text="'#' + ${orderCd}"></h2>
-			</div>
-	    </div><br/> 
-	
-	    <!-- 링크 -->
-	    <a href="http://www.xip.red" class="link" style="color: red; text-decoration: none; font-weight: 800; font-size: 15px;">www.xip.red</a>
-	</div>
+<body>
+  <div class="shipping-confirmation">
+    <div class="header">
+      <img src="https://xip-bucket.s3.ap-northeast-2.amazonaws.com/xItem/i/shop/ship/xipShipping.webp" style="background-color: #FFFFFF; width: 300px;" />
+    </div>
+    <table>
+      <tr>
+        <th>Order Number</th>
+        <td th:text="${shippInfo.orderCd}"></td>
+      </tr>
+      <tr>
+        <th>Shipping Method</th>
+        <td th:text="${shippInfo.shippingMethod}"></td>
+      </tr>
+      <tr>
+        <th>Tracking</th>
+        <td th:text="${shippInfo.trackingNum}"></td>
+      </tr>
+      <tr>
+        <th>Delivery Address</th>
+        <td>
+          <span th:text="${shippInfo.addNm}"></span><br>
+          <span th:text="${shippInfo.add1}"></span><br>
+          <span th:text="${shippInfo.add2}"></span><br>
+          <span th:text="${shippInfo.cityPostal}"></span>
+        </td>
+      </tr>
+    </table>
+
+    <hr>
+
+    <table>
+      <tr>
+        <th>Order Details</th>
+      </tr>
+      <tr th:each="detail : ${shipDetails}">
+  		<td>
+          <span th:text="${detail.name}"></span><br>
+          <span th:text="${detail.prodSize}"></span><br>
+          <span th:text="${detail.prodQty}"></span>
+        </td>
+      </tr>
+    </table>
+
+    <table>
+      <tr>
+        <th>Subtotal</th>
+        <td th:text="${shippInfo.subTotal}"></td>
+      </tr>
+      <tr>
+        <th>Shipping total</th>
+        <td th:text="${shippInfo.shippingAmount}"></td>
+      </tr>
+      <tr>
+        <th>Order Total</th>
+        <td th:text="${shippInfo.totalAmount}"></td>
+      </tr>
+    </table>
+
+    <div class="footer">
+      <a href="http://www.xip.red" class="link" style="color: red; text-decoration: none; font-weight: 800; font-size: 15px;">www.xip.red</a>
+    </div>
+  </div>
 </body>
 </html>
