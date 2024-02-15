@@ -11,14 +11,23 @@ import org.thymeleaf.context.Context;
 
 import com.red.xip.awsSesEmail.service.AwsSesService;
 import com.red.xip.xipengineering.mapper.XipengineeringMapper;
+import com.red.xip.xipengineering.model.P_Canceled;
+import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_Orders;
+import com.red.xip.xipengineering.model.P_ProdOrder;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
+import com.red.xip.xipengineering.model.P_Shipped;
 import com.red.xip.xipengineering.model.P_Tracking;
 import com.red.xip.xipengineering.model.P_User;
+import com.red.xip.xipengineering.model.R_Canceled;
+import com.red.xip.xipengineering.model.R_Cancelling;
+import com.red.xip.xipengineering.model.R_DetailCancelling;
 import com.red.xip.xipengineering.model.R_Orders;
+import com.red.xip.xipengineering.model.R_ProdOrder;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
 import com.red.xip.xipengineering.model.R_ShipDetails;
 import com.red.xip.xipengineering.model.R_ShipInfo;
+import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 
@@ -110,5 +119,65 @@ public class XipengineeringService {
 		}
 	}
 
+	public List<R_Shipped> selectShipped(P_Shipped param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectShipped(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	public List<R_Cancelling> selectCancelling(P_Cancelling param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectCancelling(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
 	
+	public List<R_DetailCancelling> selectDetailCancelling(P_Cancelling param) {
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectDetailCancelling(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	@Transactional
+	public int updateCanceled(P_Cancelling param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			mapper.updateCancelStatus(param);
+			return mapper.insertCancel(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+
+	public List<R_Canceled> selectCanceled(P_Canceled param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectCanceled(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
+
+	public List<R_ProdOrder>  selectProdOrder(P_ProdOrder param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectProdOrder(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Collections.emptyList();
+		}
+	}
 }

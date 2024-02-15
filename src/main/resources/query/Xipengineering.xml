@@ -18,8 +18,8 @@
 			WHERE   ( IFNULL(#{name}, '') = '' OR 
 						M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
 						M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
-			AND     M.CREAT_DT > #{fromDt}
-			AND     M.CREAT_DT < #{toDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
 			ORDER BY  M.CREAT_DT DESC
 		]]>
 	</select>  
@@ -36,17 +36,17 @@
 			             WHEN '3' THEN '배송완료'
 			             WHEN '0' THEN '취소요청'
 			             WHEN '-1'THEN '취소완료' END AS ORDER_STATUS,
-			        CASE WHEN CURRENCY = 'KRW' THEN TOTAL_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'KRW' THEN TOTAL_AMOUNT 
 			             ELSE '' END  AS KRW_TOTAL_AMOUNT,
-			        CASE WHEN CURRENCY = 'KRW' THEN SHIPPING_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'KRW' THEN SHIPPING_AMOUNT 
 			             ELSE '' END  AS KRW_SHIPPING_AMOUNT,
-			        CASE WHEN CURRENCY = 'KRW' THEN TOTAL_AMOUNT - SHIPPING_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'KRW' THEN TOTAL_AMOUNT - SHIPPING_AMOUNT 
 			             ELSE '' END  AS KRW_SUB_TOTAL,
-			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'USD' THEN TOTAL_AMOUNT 
 			             ELSE '' END  AS USD_TOTAL_AMOUNT,
-			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'USD' THEN TOTAL_AMOUNT 
 			             ELSE '' END  AS USD_SHIPPING_AMOUNT,
-			        CASE WHEN CURRENCY = 'USD' THEN TOTAL_AMOUNT 
+			        CASE WHEN M.CURRENCY = 'USD' THEN TOTAL_AMOUNT 
 			             ELSE '' END  AS USD_SUB_TOTAL
 			FROM    XIP_ORDER AS M
 			        INNER JOIN XIP_INCU AS X
@@ -54,9 +54,9 @@
 			        AND X.EMAIL = #{email}
 			WHERE   CASE WHEN #{orderStatus} = '' THEN TRUE
 					     ELSE M.ORDER_STATUS = #{orderStatus} END
-			AND     M.ORDER_DT > #{fromDt}
-			AND     M.ORDER_DT < #{toDt}
-			ORDER BY  M.CREAT_DT DESC
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			ORDER BY  M.ORDER_DT DESC
 		]]>
 	</select>
 	
@@ -65,7 +65,7 @@
 		resultType="com.red.xip.xipengineering.model.R_PurchaseOrders">
 		<![CDATA[
 			SELECT  M.ORDER_CD,
-			        CONCAT(U.LAST_NM, ' ', U.FIRST_NM) AS USER_NM,
+			        CONCAT(U.FIRST_NM, ' ', U.LAST_NM) AS USER_NM,
 			        U.EMAIL,
 			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
 			        '운송장 등록' AS TRACKING_INPUT
@@ -76,8 +76,8 @@
 			        LEFT OUTER JOIN XIP_USERS AS U
 			        ON  U.USER_CD = M.USER_CD
 			WHERE   M.ORDER_STATUS = #{orderStatus}
-			AND     M.ORDER_DT > #{fromDt}
-			AND     M.ORDER_DT < #{toDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
 			ORDER BY  M.CREAT_DT DESC
 		]]>
 	</select>
@@ -144,22 +144,22 @@
 		parameterType = "com.red.xip.xipengineering.model.P_Tracking"
 		resultType="com.red.xip.xipengineering.model.R_ShipInfo">
 		<![CDATA[
-			SELECT  M.ORDER_CD,
+			SELECT  CONCAT('#XIP-',M.ORDER_CD) AS ORDER_CD,
 			        M.SHIPPING_METHOD,
 			        M.TRACKING_NUM,
 			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
 			        M.ADD_1,
 			        M.ADD_2,
 			        CONCAT(M.CITY,', ', M.STATE, ', ', M.POSTAL_CD, ', ', M.ADD_COUNTRY) AS CITY_POSTAL,
-			        CASE CURRENCY
+			        CASE M.CURRENCY
 			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT,0) )
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
 			             ELSE '' END AS TOTAL_AMOUNT,
-			        CASE CURRENCY
+			        CASE M.CURRENCY
 			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(SHIPPING_AMOUNT,0) )
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(SHIPPING_AMOUNT,0) )    
 			             ELSE '' END AS SHIPPING_AMOUNT,
-			        CASE CURRENCY
+			        CASE M.CURRENCY
 			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
 			             ELSE '' END AS SUB_TOTAL
@@ -202,6 +202,197 @@
 			        LEFT OUTER JOIN XIP_PROD AS P
 			        ON  P.PROD_CD = PD.PROD_CD
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<select id="selectShipped" 
+		parameterType = "com.red.xip.xipengineering.model.P_Shipped"
+		resultType="com.red.xip.xipengineering.model.R_Shipped">
+		<![CDATA[	
+			SELECT  M.ORDER_CD,
+			        CONCAT(U.FIRST_NM, ' ', U.LAST_NM) AS USER_NM,
+			        U.EMAIL,
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
+			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
+			        DATE_FORMAT(M.SHIP_DT, '%Y-%m-%d %H:%i:%s') AS SHIP_DT,
+			        M.TRACKING_NUM
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_USERS AS U 
+			        ON  U.USER_CD = M.USER_CD
+			WHERE   M.ORDER_STATUS IN ('2','3')
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			ORDER BY  M.ORDER_DT DESC
+		]]>
+	</select>
+	
+	<select id="selectCancelling" 
+		parameterType = "com.red.xip.xipengineering.model.P_Cancelling"
+		resultType="com.red.xip.xipengineering.model.R_Cancelling">
+		<![CDATA[	
+			SELECT  M.ORDER_CD,
+					CASE M.ORDER_STATUS 
+			             WHEN '1' THEN '배송전'
+			             WHEN '2' THEN '배송후'
+			             WHEN '0' THEN '취소요청' END AS ORDER_STATUS,
+			        CONCAT(U.FIRST_NM, ' ', U.LAST_NM) AS USER_NM,
+			        U.EMAIL,
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
+			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
+			        CASE M.CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(M.TOTAL_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.TOTAL_AMOUNT,0) )    
+			             ELSE '' END AS TOTAL_AMOUNT,
+			        CASE M.CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(M.SHIPPING_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.SHIPPING_AMOUNT,0) )    
+			             ELSE '' END AS SHIPPING_AMOUNT,
+			        CASE M.CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )    
+			             ELSE '' END AS SUB_TOTAL,
+			        '취소버튼' AS CANCEL_BTN
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_USERS AS U 
+			        ON  U.USER_CD = M.USER_CD
+			WHERE   M.ORDER_STATUS = #{orderStatus}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			ORDER BY  M.ORDER_DT DESC
+		]]>
+	</select>
+	
+	<select id="selectDetailCancelling" 
+		parameterType = "com.red.xip.xipengineering.model.P_Cancelling"
+		resultType="com.red.xip.xipengineering.model.R_DetailCancelling">
+		<![CDATA[	
+			SELECT  D.PROD_CD_D,
+			        P.NAME,
+			        PD.PROD_SIZE,
+			        D.PROD_QTY,
+			        P.PRICE * D.PROD_QTY AS PRICE,
+			        M.CURRENCY
+			FROM    XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        INNER JOIN XIP_ORDER_D AS D 
+			        ON  D.ORDER_CD = M.ORDER_CD
+			        INNER JOIN XIP_PROD_D AS PD
+			        ON  PD.PROD_CD_D = D.PROD_CD_D
+			        INNER JOIN XIP_PROD AS P
+			        ON  P.PROD_CD = PD.PROD_CD
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</select>
+	
+	<update id="updateCancelStatus" 
+		parameterType = "com.red.xip.xipengineering.model.P_Cancelling">
+		<![CDATA[
+			UPDATE  XIP_ORDER AS M
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			   SET  ORDER_STATUS = '-1'
+			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</update>
+	
+	<insert id="insertCancel" 
+		parameterType = "com.red.xip.xipengineering.model.P_Cancelling">
+		<![CDATA[
+			INSERT INTO XIP_CANCEL (
+			    ORDER_CD,
+			    CURRENCY,
+			    CANCEL_AMOUNT,
+			    REASON,
+			    CREAT_DT,
+			    MODIFY_DT
+			)
+			SELECT  ORDER_CD,
+					CURRENCY,
+					#{cancelAmount},
+					#{reason},
+					NOW(),
+					NOW()
+			FROM    XIP_ORDER
+			WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		]]>
+	</insert>
+	
+	<select id="selectCanceled" 
+		parameterType = "com.red.xip.xipengineering.model.P_Canceled"
+		resultType="com.red.xip.xipengineering.model.R_Canceled">
+		<![CDATA[	
+			SELECT  M.ORDER_CD,
+			        CONCAT(U.FIRST_NM, ' ', U.LAST_NM) AS USER_NM,
+			        U.EMAIL,
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
+			        DATE_FORMAT(C.CREAT_DT, '%Y-%m-%d %H:%i:%s') AS CANCEL_DT,
+			        CASE C.CURRENCY
+			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(C.CANCEL_AMOUNT,0) )
+			             WHEN 'USD' THEN CONCAT( '$', FORMAT(C.CANCEL_AMOUNT,0) )    
+			             ELSE '' END AS CANCEL_AMOUNT
+			FROM    XIP_CANCEL AS C
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        INNER JOIN XIP_ORDER AS M 
+			        ON  C.ORDER_CD = M.ORDER_CD
+			        INNER JOIN XIP_USERS AS U
+			        ON  U.USER_CD = M.USER_CD 
+			WHERE   M.ORDER_STATUS = '-1'
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			ORDER BY  M.ORDER_DT DESC
+		]]>
+	</select>
+	
+	<select id="selectProdOrder" 
+		parameterType = "com.red.xip.xipengineering.model.P_ProdOrder"
+		resultType="com.red.xip.xipengineering.model.R_ProdOrder">
+		<![CDATA[	
+			SELECT  PD.PROD_CD_D,
+			        P.NAME,
+			        PD.PROD_SIZE,
+			        PD.SOLD_QTY,
+			        PD.TOTAL_QTY,
+			        PD.TOTAL_QTY - PD.SOLD_QTY AS STOCK_QTY,
+			        SUM(IFNULL(O.PROD_QTY,0)) AS PROD_QTY,
+			        SUM(CASE WHEN O.CURRENCY = 'KRW' THEN IFNULL(P.PRICE,0)  * IFNULL(O.PROD_QTY,0)
+			             ELSE 0 END)  AS KRW_SUB_TOTAL,
+			        SUM(CASE WHEN O.CURRENCY = 'USD' THEN IFNULL(P.US_PRICE,0)  * IFNULL(O.PROD_QTY,0) 
+			             ELSE 0 END)  AS USD_SUB_TOTAL,
+			        '수정' AS EDIT_BTN
+			FROM    XIP_PROD_D AS PD 
+			        INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			        LEFT OUTER JOIN XIP_PROD AS P
+			        ON  P.PROD_CD = PD.PROD_CD
+			        LEFT OUTER JOIN (
+			            SELECT  M.ORDER_CD,
+			                    D.PROD_QTY,
+			                    M.CURRENCY,
+			                    D.PROD_CD_D
+			            FROM    XIP_ORDER AS M
+			                    INNER JOIN XIP_ORDER_D AS D
+			                    ON  D.ORDER_CD = M.ORDER_CD
+			            WHERE   M.ORDER_STATUS IN ('0','1','2','3')
+			            AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+						AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			        ) AS O
+			        ON  O.PROD_CD_D = PD.PROD_CD_D
+			GROUP BY PD.PROD_CD_D, P.NAME, PD.PROD_SIZE, SOLD_QTY, TOTAL_QTY, STOCK_QTY
 		]]>
 	</select>
 	

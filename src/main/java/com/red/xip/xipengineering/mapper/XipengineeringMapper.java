@@ -5,14 +5,23 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.red.xip.xipengineering.model.P_Canceled;
+import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_Orders;
+import com.red.xip.xipengineering.model.P_ProdOrder;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
+import com.red.xip.xipengineering.model.P_Shipped;
 import com.red.xip.xipengineering.model.P_Tracking;
 import com.red.xip.xipengineering.model.P_User;
+import com.red.xip.xipengineering.model.R_Canceled;
+import com.red.xip.xipengineering.model.R_Cancelling;
+import com.red.xip.xipengineering.model.R_DetailCancelling;
 import com.red.xip.xipengineering.model.R_Orders;
+import com.red.xip.xipengineering.model.R_ProdOrder;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
 import com.red.xip.xipengineering.model.R_ShipDetails;
 import com.red.xip.xipengineering.model.R_ShipInfo;
+import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 import com.red.xip.xipengineering.model.TrackingProd;
@@ -38,4 +47,18 @@ public interface XipengineeringMapper {
 	String selectShipEmail(P_Tracking param) throws Exception;
 
 	List<R_ShipDetails> selectShipDetails(P_Tracking param) throws Exception;
+
+	List<R_Shipped> selectShipped(P_Shipped param) throws Exception;
+
+	List<R_Cancelling> selectCancelling(P_Cancelling param) throws Exception;
+
+	int updateCancelStatus(P_Cancelling param) throws Exception;
+
+	int insertCancel(P_Cancelling param) throws Exception;
+
+	List<R_Canceled> selectCanceled(P_Canceled param) throws Exception;
+
+	List<R_DetailCancelling> selectDetailCancelling(P_Cancelling param) throws Exception;
+
+	List<R_ProdOrder> selectProdOrder(P_ProdOrder param) throws Exception;
 }

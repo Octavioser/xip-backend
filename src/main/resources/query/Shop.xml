@@ -321,7 +321,8 @@
 	<update id ="updateCancleOrder"
 			parameterType = "com.red.xip.shop.model.P_OrderD">
 		UPDATE  XIP_ORDER
-		   SET  ORDER_STATUS = '0'
+		   SET  ORDER_STATUS = '0',
+		   		MODIFY_DT = NOW()
 		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
 		AND     ORDER_STATUS = '1'
