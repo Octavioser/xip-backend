@@ -61,7 +61,7 @@ public class XipengineeringController {
 			return 1; 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class XipengineeringController {
 			return service.selectUsers(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -129,7 +129,7 @@ public class XipengineeringController {
 			return service.selectOrders(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -163,7 +163,7 @@ public class XipengineeringController {
 			return service.selectPurchaseOrder(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -197,7 +197,7 @@ public class XipengineeringController {
 			return service.selectTracking(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -231,7 +231,7 @@ public class XipengineeringController {
 			return service.updateTrackingNum(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -266,7 +266,7 @@ public class XipengineeringController {
 			return service.selectShipped(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -300,7 +300,7 @@ public class XipengineeringController {
 			return service.selectCancelling(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -334,7 +334,7 @@ public class XipengineeringController {
 			return service.selectDetailCancelling(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -368,7 +368,7 @@ public class XipengineeringController {
 			return service.updateCanceled(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -402,7 +402,7 @@ public class XipengineeringController {
 			return service.selectCanceled(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	
@@ -436,7 +436,41 @@ public class XipengineeringController {
 			return service.selectProdOrder(param);
 		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateTrackingNum  운송장 등록 다이얼로그
+	@PostMapping("/incuU203")
+	@ResponseBody
+	public Object updateProdOrder (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdOrder param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.updateProdOrder(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
 		}
 	}
 	

@@ -14,9 +14,9 @@ public interface LoginMapper {
 
 	int selectEmailCheck(P_Login param) throws Exception;
 
-	int insertCreateAccount(P_Login param);
+	int insertCreateAccount(P_Login param) throws Exception;
 
-	List<R_Login> test(P_Login param);
+	List<R_Login> test(P_Login param) throws Exception;
 	
 	List<R_Login> getLoginCheck (P_Login param);
 	
@@ -36,5 +36,5 @@ public interface LoginMapper {
 
 	int updatePw(P_Login param) throws Exception;
 
-	int selectEmailAuthCodeTimeCheck(P_Login param);
+	int selectEmailAuthCodeTimeCheck(P_Login param) throws Exception;
 }

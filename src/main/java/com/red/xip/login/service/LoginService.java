@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -79,7 +80,7 @@ public class LoginService {
 	private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 
 	
-	public List<R_Login> getLoginCheck(P_Login param) {
+	public List<R_Login> getLoginCheck(P_Login param) throws Exception {
 		try {
 			List<R_Login> resultData = mapper.getLoginCheck(param);
 
@@ -112,6 +113,7 @@ public class LoginService {
 	}
 
 	// 비회원이메일 체크 후 인증코드
+	@Transactional(rollbackFor = Exception.class)
 	public int selectEmailCheckAuthCode(P_Login param) throws Exception {
 		try {
 			Random random = new Random();
@@ -130,6 +132,10 @@ public class LoginService {
 				
 				param.setAuthCd(resultNum);
 				
+				int result = mapper.insertAuthCd(param);
+
+				System.out.println(result);
+				
 				Context context = new Context();
 		        context.setVariable("resultNum", resultNum);
 
@@ -140,7 +146,6 @@ public class LoginService {
 			    String receiverEmail = param.getEmail();
 			    String emailSubject = "XIP account confirmation";
 				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
-				mapper.insertAuthCd(param);
 			}
 			return count;
 			
@@ -152,22 +157,33 @@ public class LoginService {
 	}
 
 	// 회원가입
+	@Transactional(rollbackFor = Exception.class)
 	public int insertCreateAccount(P_Login param) throws Exception {
-		// TODO Auto-generated method stub
-		int checkEmail = mapper.selectEmailCheck(param);
-		if(checkEmail > 0) {
-			// 계정이 있을 경우
-			return -1;
+		try {
+			int checkEmail = mapper.selectEmailCheck(param);
+			if(checkEmail > 0) {
+				// 계정이 있을 경우
+				return -1;
+			}
+			param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
+			int count =	mapper.selectEmailAuthCodeCheck(param);
+			if(count == 0) {
+				return -1;
+			}
+
+			int result = mapper.insertCreateAccount(param);
+			if (result != 1) {
+				throw new RuntimeException("######### Expected insertCreateAccount count 1, but was " + result);
+			}
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
-		param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
-		int count =	mapper.selectEmailAuthCodeCheck(param);
-		if(count == 0) {
-			return -1;
-		}
-		return mapper.insertCreateAccount(param);
+		
 	}
 
-	public int selectEmailAuthCodeCheck(P_Login param) {
+	public int selectEmailAuthCodeCheck(P_Login param) throws Exception {
 		// TODO Auto-generated method stub
 		try {
 			int count =	mapper.selectEmailAuthCodeTimeCheck(param); // 제한시간안에 인증코드
@@ -180,8 +196,8 @@ public class LoginService {
 	}
 
 	// 회원가입되어있는지 webAuth등록이 되어있는지 확인 -> 확인되면 생체인증을 위한 값 리턴
+	@Transactional(rollbackFor = Exception.class)
 	public List<R_WebAuth> selectWebAuthCheck(P_WebAuth param) throws Exception {
-		// TODO Auto-generated method stub
 		try {
 			List<R_WebAuth> result = mapper.selectWebAuthItem(param);
 			
@@ -201,7 +217,11 @@ public class LoginService {
 			        // 챌린지값 저장
 			        param.setChallenge(challenge);
 			        param.setUserCd(result.get(0).getUserCd()); 
-			        mapper.updateChallenge(param);
+			        
+			        int resultItem = mapper.updateChallenge(param);
+					if (resultItem != 1) {
+						throw new RuntimeException("######### Expected updateChallenge count 1, but was " + resultItem);
+					}
 				}
 				result.get(0).setUserCd(null);
 				result.get(0).setPw(null);
@@ -222,59 +242,67 @@ public class LoginService {
 		
 	}
 
-	// 회원인지 확인 후 등록에 필요한 값 리턴
+	// 회원인지 확인 후 생체인증등록에 필요한 값 리턴
+	@Transactional(rollbackFor = Exception.class)
 	public List<R_WebAuth> selectWebAuthCreateItem(P_WebAuth param) throws Exception {
-		// TODO Auto-generated method stub
-		
-		P_Login param2 = new P_Login();
-		
-		param2.setEmail(param.getEmail());
-		
-		List<R_Login> resultData = mapper.getLoginCheck(param2);
-
-		// 패스워드가 맞는 지 확인
-		if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
+		try {
+			P_Login param2 = new P_Login();
 			
-			List<R_WebAuth> result = mapper.selectWebAuthItem(param);
-
-			// 회원가입이 되어있는지 확인
-			if(!"".equals(CommonUtils.stringIfNull(result.get(0).getEmail()))) {
-				SecureRandom random = new SecureRandom();
-		        byte[] bytes = new byte[32]; // 32바이트의 무작위 데이터 생성
-		        random.nextBytes(bytes);
-		        
-		        // challange변수 생성
-		        String Challenge = Base64.getUrlEncoder().encodeToString(bytes);
-		        result.get(0).setChallenge(Challenge);
-				result.get(0).setUserIdBase64( // userIdBuffer 생성
-					Base64.getEncoder().encodeToString(result.get(0).getUserCd().getBytes())
-				); 
+			param2.setEmail(param.getEmail());
+			
+			List<R_Login> resultData = mapper.getLoginCheck(param2);
+	
+			// 패스워드가 맞는 지 확인
+			if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
 				
-				// challange 저장하기
-		        param.setChallenge(Challenge);
-		        mapper.createWebAuthnSaveChallenge(param); // 챌린지 값이외에 null값으로 변경(초기화)
+				List<R_WebAuth> result = mapper.selectWebAuthItem(param);
+	
+				// 회원가입이 되어있는지 확인
+				if(!"".equals(CommonUtils.stringIfNull(result.get(0).getEmail()))) {
+					SecureRandom random = new SecureRandom();
+			        byte[] bytes = new byte[32]; // 32바이트의 무작위 데이터 생성
+			        random.nextBytes(bytes);
+			        
+			        // challange변수 생성
+			        String Challenge = Base64.getUrlEncoder().encodeToString(bytes);
+			        result.get(0).setChallenge(Challenge);
+					result.get(0).setUserIdBase64( // userIdBuffer 생성
+						Base64.getEncoder().encodeToString(result.get(0).getUserCd().getBytes())
+					); 
+					
+					// challange 저장하기
+			        param.setChallenge(Challenge);
+			        
+			        int resultItem = mapper.createWebAuthnSaveChallenge(param); // 챌린지 값이외에 null값으로 변경(초기화)
+					if (resultItem != 1) {
+						throw new RuntimeException("######### Expected createWebAuthnSaveChallenge count 1, but was " + resultItem);
+					}
+
+				}
+				else {
+					return Collections.emptyList();
+				}
+	
+				result.get(0).setUserCd(null);
+				result.get(0).setPw(null);
+				result.get(0).setPk(null);
+				result.get(0).setAaguid(null);
+				result.get(0).setRoleType(null);
+	
+				return result;
+	
 			}
 			else {
 				return Collections.emptyList();
 			}
-
-			result.get(0).setUserCd(null);
-			result.get(0).setPw(null);
-			result.get(0).setPk(null);
-			result.get(0).setAaguid(null);
-			result.get(0).setRoleType(null);
-
-			return result;
-
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
-		else {
-			return Collections.emptyList();
-		}
-		
-		
 	}
 
 	// 생체인증 등록
+	@Transactional(rollbackFor = Exception.class)
 	public int updateSaveWebAuth(P_WebAuth param) throws Exception {
 		// TODO Auto-generated method stub
 		try {
@@ -328,14 +356,18 @@ public class LoginService {
 			//  clientData 맞는지 확인
 	        if("webauthn.create".equals(type) && appOrigin.equals(origin) && savedChallenge.equals(challenge)) {
 	        	param.setUserCd(result.get(0).getUserCd());
-	        	return mapper.updateSaveWebAuth(param);
+	        	int resultItem = mapper.updateSaveWebAuth(param);
+	        	if (resultItem != 1) {
+	    			throw new RuntimeException("######### Expected updateSaveWebAuth count 1, but was " + resultItem);
+	    		}
+	        	return resultItem;
 	        }
 	        
 	        return -1;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return -1;
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 	
@@ -458,9 +490,6 @@ public class LoginService {
 			result.get(0).setAaguid(null);
 			result.get(0).setRoleType(null);
 			
-			
-			
-			
 			return result;
 			
 
@@ -471,7 +500,8 @@ public class LoginService {
 		}
 	}
 	
-	// 이메일 체크
+	// 이메일 체크 생체인증 등록되있는지도 확인
+	@Transactional(rollbackFor = Exception.class)
 	public List<R_WebAuth> selectEmailCheck(P_WebAuth param) throws Exception {
 		try {
 			
@@ -498,7 +528,11 @@ public class LoginService {
 			        
 			        resultData.get(0).setUserCd(null);
 			        
-			        mapper.updateChallenge(param);
+			        int result = mapper.updateChallenge(param);
+					
+					if (result != 1) {
+						throw new RuntimeException("######### Expected updateChallenge count 1, but was " + result);
+					}
 				}
 				// 회원가입은 되어있지만 webauth이 등록되지 않은 사용자
 				else if(!"".equals(CommonUtils.stringIfNull(resultData.get(0).getEmail()))){
@@ -520,6 +554,7 @@ public class LoginService {
 	}
 
 	// 비번업데이트 회원인지 체크 후 인증코드
+	@Transactional(rollbackFor = Exception.class)
 	public int selectForgotPwAuthCode(P_Login param) throws Exception {
 		try {
 			Random random = new Random();
@@ -538,6 +573,8 @@ public class LoginService {
 				
 				param.setAuthCd(resultNum);
 				
+				mapper.insertAuthCd(param);
+				
 				Context context = new Context();
 		        context.setVariable("resultNum", resultNum);
 
@@ -548,30 +585,42 @@ public class LoginService {
 			    String receiverEmail = param.getEmail();
 			    String emailSubject = "XIP reset your password";
 				awsSesService.sendEmail(emailContent, senderEmail, receiverEmail, emailSubject);
-				mapper.insertAuthCd(param);
+				
 			}
 			return count;
 			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			return -1;
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public int updatePw(P_Login param) throws Exception {
-		// TODO Auto-generated method stub
-		int checkEmail = mapper.selectEmailCheck(param);
-		if(checkEmail < 1) {
-			// 계정이 있을 경우
-			return -1;
+		try {
+			int checkEmail = mapper.selectEmailCheck(param);
+			if(checkEmail < 1) {
+				return -1;
+			}
+			
+			param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
+			
+			int count =	mapper.selectEmailAuthCodeCheck(param);
+			if(count < 1) {
+				return -1;
+			}
+			
+			int result = mapper.updatePw(param);
+			
+			if (result != 1) {
+				throw new RuntimeException("######### Expected updatePw count 1, but was " + result);
+			}
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
-		param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
-		int count =	mapper.selectEmailAuthCodeCheck(param);
-		if(count < 1) {
-			return -1;
-		}
-		return mapper.updatePw(param);
 	}
 
 }

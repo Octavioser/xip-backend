@@ -20,5 +20,6 @@ public class R_ProdOrder {
 	private BigDecimal prodQty;
 	private BigDecimal krwSubTotal;
 	private BigDecimal usdSubTotal;
-	private String editBtn;
+	private BigDecimal soldTotal;
+	private String saveBtn;
 }

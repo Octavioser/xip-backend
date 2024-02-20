@@ -5,7 +5,7 @@
 
 	<select id ="selectDetailAccount"
 			parameterType = "com.red.xip.shop.model.P_Account"
-			resultType="com.red.xip.shop.model.R_Account">
+			resultType="com.red.xip.shop.model.R_AccountDetail">
 	<![CDATA[
 		SELECT  IFNULL(M.FIRST_NM, '') AS FIRST_NM,
                 IFNULL(M.LAST_NM, '') AS LAST_NM,
@@ -75,6 +75,7 @@
 	        ADD_2,
 	        CITY,
 	        ADD_COUNTRY,
+	        ISO2,
 	        STATE,
 	        POSTAL_CD,
 	        CREAT_DT,
@@ -90,6 +91,7 @@
 	        #{add2},
 	        #{city},
 	        #{addCountry},
+	        #{iso2},
 	        #{state},
 	        #{postalCd},
 	        NOW(),
@@ -104,6 +106,7 @@
         ADD_2 = #{add2},
         CITY = #{city},
         ADD_COUNTRY = #{addCountry},
+        ISO2 = #{iso2},
         STATE = #{state},
         POSTAL_CD = #{postalCd},
         MODIFY_DT = NOW();
@@ -318,7 +321,7 @@
 		AND     M.USER_CD = CAST(#{userCd}AS UNSIGNED)
 	</select> 
 	
-	<update id ="updateCancleOrder"
+	<update id ="updateCancelOrder"
 			parameterType = "com.red.xip.shop.model.P_OrderD">
 		UPDATE  XIP_ORDER
 		   SET  ORDER_STATUS = '0',
@@ -326,6 +329,16 @@
 		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
 		AND     ORDER_STATUS = '1'
+	</update>
+	
+	<update id ="updateCancellingCancel"
+			parameterType = "com.red.xip.shop.model.P_OrderD">
+		UPDATE  XIP_ORDER
+		   SET  ORDER_STATUS = '1',
+		   		MODIFY_DT = NOW()
+		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
+		AND     ORDER_STATUS = '0'
 	</update>
 	
 </mapper>

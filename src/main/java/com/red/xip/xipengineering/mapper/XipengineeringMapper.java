@@ -61,4 +61,6 @@ public interface XipengineeringMapper {
 	List<R_DetailCancelling> selectDetailCancelling(P_Cancelling param) throws Exception;
 
 	List<R_ProdOrder> selectProdOrder(P_ProdOrder param) throws Exception;
+
+	int updateProdOrder(P_ProdOrder param) throws Exception;
 }

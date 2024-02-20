@@ -10,6 +10,7 @@ import com.red.xip.shop.model.P_Order;
 import com.red.xip.shop.model.P_OrderD;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.model.R_Account;
+import com.red.xip.shop.model.R_AccountDetail;
 import com.red.xip.shop.model.R_Cart;
 import com.red.xip.shop.model.R_Order;
 import com.red.xip.shop.model.R_OrderD;
@@ -19,7 +20,7 @@ import com.red.xip.shop.model.orderDetails;
 @Mapper
 public interface ShopMapper {
 
-	List<R_Account> selectDetailAccount(P_Account param) throws Exception;
+	List<R_AccountDetail> selectDetailAccount(P_Account param) throws Exception;
 	
 	int updateAccountInfoNm(P_Account param) throws Exception;
 	
@@ -53,5 +54,7 @@ public interface ShopMapper {
 
 	List<orderDetails> selectOrderDetailProducts(P_OrderD param) throws Exception;
 
-	int updateCancleOrder(P_OrderD param) throws Exception;
+	int updateCancelOrder(P_OrderD param) throws Exception;
+
+	int updateCancellingCancel(P_OrderD param)throws Exception;
 }

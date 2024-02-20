@@ -18,8 +18,8 @@
 			WHERE   ( IFNULL(#{name}, '') = '' OR 
 						M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
 						M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
-			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
-			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
+			AND     DATE_FORMAT(M.CREAT_DT, '%Y%m%d') >= #{fromDt}
+			AND     DATE_FORMAT(M.CREAT_DT, '%Y%m%d') <= #{toDt}
 			ORDER BY  M.CREAT_DT DESC
 		]]>
 	</select>  
@@ -324,6 +324,9 @@
 					NOW(),
 					NOW()
 			FROM    XIP_ORDER
+					INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
 			WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</insert>
@@ -372,7 +375,7 @@
 			             ELSE 0 END)  AS KRW_SUB_TOTAL,
 			        SUM(CASE WHEN O.CURRENCY = 'USD' THEN IFNULL(P.US_PRICE,0)  * IFNULL(O.PROD_QTY,0) 
 			             ELSE 0 END)  AS USD_SUB_TOTAL,
-			        '수정' AS EDIT_BTN
+			        '저장' AS SAVE_BTN
 			FROM    XIP_PROD_D AS PD 
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -395,5 +398,19 @@
 			GROUP BY PD.PROD_CD_D, P.NAME, PD.PROD_SIZE, SOLD_QTY, TOTAL_QTY, STOCK_QTY
 		]]>
 	</select>
+	<update id="updateProdOrder" 
+		parameterType = "com.red.xip.xipengineering.model.P_ProdOrder">
+		<![CDATA[
+			UPDATE  XIP_PROD_D
+					INNER JOIN XIP_INCU AS X
+			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
+			        AND X.EMAIL = #{email}
+			   SET  SOLD_QTY = #{soldQty},
+			        TOTAL_QTY = #{totalQty}     
+			WHERE   PROD_CD_D = #{prodCd} 
+		]]>
+	</update>
+	
+	  
 	
 </mapper>
