@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.red.xip.xipengineering.model.P_Canceled;
 import com.red.xip.xipengineering.model.P_Cancelling;
+import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
@@ -25,6 +26,7 @@ import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 import com.red.xip.xipengineering.model.TrackingProd;
+import com.red.xip.xipengineering.model.prodCdColumns;
 
 
 @Mapper
@@ -63,4 +65,10 @@ public interface XipengineeringMapper {
 	List<R_ProdOrder> selectProdOrder(P_ProdOrder param) throws Exception;
 
 	int updateProdOrder(P_ProdOrder param) throws Exception;
+
+	int insertProdD(List<prodCdColumns> prodCdD) throws Exception;
+	
+	int insertProd(P_NewProd param) throws Exception;
+
+	int insertProdDImg(P_NewProd param) throws Exception;
 }

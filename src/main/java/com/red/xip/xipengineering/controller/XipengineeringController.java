@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.red.xip.common.CommonUtils;
 import com.red.xip.xipengineering.model.P_Canceled;
 import com.red.xip.xipengineering.model.P_Cancelling;
+import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
@@ -468,6 +469,40 @@ public class XipengineeringController {
 			param.setEmail(email);
 			
 			return service.updateProdOrder(param);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return -1;  // -1 에러 -2 에러 및 로그아웃
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// insertProdItem  제품등록
+	@PostMapping("/incuC101")
+	@ResponseBody
+	public Object insertProdItem (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_NewProd param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return -2;
+			}
+			
+			if(!"X".equals(roleType)) {
+				return -2;
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return service.insertProdItem(param);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return -1;  // -1 에러 -2 에러 및 로그아웃

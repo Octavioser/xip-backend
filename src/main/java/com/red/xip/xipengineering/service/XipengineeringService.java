@@ -1,6 +1,7 @@
 package com.red.xip.xipengineering.service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.red.xip.awsS3Upload.S3Service;
 import com.red.xip.awsSesEmail.service.AwsSesService;
 import com.red.xip.xipengineering.mapper.XipengineeringMapper;
 import com.red.xip.xipengineering.model.P_Canceled;
 import com.red.xip.xipengineering.model.P_Cancelling;
+import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
@@ -39,6 +42,9 @@ public class XipengineeringService {
 	
 	@Autowired
 	AwsSesService awsSesService;
+	
+	@Autowired
+	S3Service s3Service;
 	
 	@Autowired // 이메일템플릿
     private TemplateEngine templateEngine;
@@ -190,5 +196,49 @@ public class XipengineeringService {
 			e.printStackTrace();
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public Object insertProdItem(P_NewProd param) throws Exception{
+		 
+		try {
+			String prodCd = param.getProdCd();
+			String filePath = "xItem/i/shop/products/" + prodCd + "/" + prodCd + ".gif";
+			HashMap<String,String> imgItem = param.getImg();
+			
+			param.setImageSrc(filePath);
+			
+			mapper.insertProd(param);
+			
+			mapper.insertProdD(param.getProdCdD());
+
+			String index; 
+			
+			String prodDetailImgSrc = "";
+			
+			for(int i=0; i<imgItem.size(); i++) {
+				
+				index = String.valueOf(i);
+				System.out.println(imgItem.get("image" + index));
+				if(i > 0) {
+					filePath = "xItem/i/shop/products/" + prodCd + "/" + "detail" + "/" + prodCd + "_" + index + ".webp";
+					if("".equals(prodDetailImgSrc)) {
+						prodDetailImgSrc = prodDetailImgSrc + filePath;
+					}
+					else {
+						prodDetailImgSrc = prodDetailImgSrc + "|" + filePath;
+					}
+				}
+				
+				s3Service.uploadBase64Image(imgItem.get("image" + index), filePath);
+			}
+			param.setProdDSrc(prodDetailImgSrc);
+			mapper.insertProdDImg(param);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+        return 1;
 	}
 }

@@ -399,7 +399,7 @@
 		]]>
 	</select>
 	<update id="updateProdOrder" 
-		parameterType = "com.red.xip.xipengineering.model.P_ProdOrder">
+		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
 		<![CDATA[
 			UPDATE  XIP_PROD_D
 					INNER JOIN XIP_INCU AS X
@@ -410,6 +410,76 @@
 			WHERE   PROD_CD_D = #{prodCd} 
 		]]>
 	</update>
+	
+	<insert id="insertProd" 
+		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
+		<![CDATA[
+			INSERT INTO  XIP_PROD (
+			    PROD_CD,
+			    NAME,
+			    PRICE,
+			    US_PRICE,
+			    SIZE_OPT,
+			    STATUS,
+			    LINE,
+			    SEASON,
+			    PROD_DESC,
+			    PROD_DESC_D,
+			    IMAGE_SRC,
+			    CREAT_DT,
+			    MODIFY_DT
+			)
+			VALUES (
+			    #{prodCd},
+			    #{name},
+			    #{price},
+			    #{usPrice},
+			    #{sizeOpt},
+			    #{status},
+			    #{line},
+			    #{season},
+			    #{prodDesc},
+			    #{prodDescD},
+			    #{imageSrc},
+			    NOW(),
+			    NOW()
+			)
+		]]>
+	</insert>
+	
+	<insert id="insertProdD" 
+		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
+		<![CDATA[
+			INSERT INTO XIP_PROD_D(
+				PROD_CD_D,
+				PROD_CD,
+				PROD_SIZE,
+				SOLD_QTY,
+				TOTAL_QTY,
+				CREAT_DT,
+				MODIFY_DT
+			)
+			VALUES
+		]]>
+		<foreach collection="list" item="item" separator=",">
+            (#{item.prodCdD}, #{item.prodCd}, #{item.prodSize}, 0, #{item.totalQty}, NOW(), NOW())
+        </foreach>
+	</insert>
+	
+	<insert id="insertProdDImg" 
+		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
+		<![CDATA[
+			INSERT INTO XIP_IMAGE(
+				IMAGE_CD,
+				IMG_SRC
+			)
+			VALUES (
+			    #{prodCd},
+			    #{prodDSrc}
+			)
+		]]>
+		
+	</insert>
 	
 	  
 	
