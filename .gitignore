@@ -42,3 +42,6 @@ out/
 
 ### SSL ###
 keystore.p12
+
+### logs ##
+logs/
