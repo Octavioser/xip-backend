@@ -11,7 +11,6 @@ public class P_Login {
 
 	private String email;
 	private String pw;
-	private String gender;
 	private String firstNm;
 	private String lastNm;
 	private String authCd;
