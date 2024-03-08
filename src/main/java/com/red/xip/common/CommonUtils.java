@@ -51,6 +51,11 @@ public class CommonUtils {
     }
 	
 	public static void ipLog (HttpServletRequest servletRequest) {
+		String realIp = servletRequest.getHeader("X-Forwarded-For");
+		if (realIp == null) {
+		    realIp = servletRequest.getRemoteAddr();
+		}
+		logger.info("로그인 시도 - 클라이언트 IP: {}", realIp);
 		logger.info("###########클라이언트 IP: ",servletRequest.getRemoteAddr());
     }
 }
