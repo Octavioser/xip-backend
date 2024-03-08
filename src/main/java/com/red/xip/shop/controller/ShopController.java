@@ -164,6 +164,7 @@ public class ShopController {
 	@ResponseBody
 	public Object selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
+		CommonUtils.ipLog(servletRequest);
     	return service.selectProdList(param);
 	}
 	

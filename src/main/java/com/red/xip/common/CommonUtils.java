@@ -3,10 +3,15 @@ import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
 public class CommonUtils {
+	
+	private final static Logger logger = LoggerFactory.getLogger(CommonUtils.class); 
 
 	public static HashMap<String, String> getUserInfoFromCookie (HttpServletRequest servletRequest) {
 		
@@ -43,5 +48,9 @@ public class CommonUtils {
             return "";
         }
         return str;
+    }
+	
+	public static void ipLog (HttpServletRequest servletRequest) {
+		logger.info("###########클라이언트 IP: ",servletRequest.getRemoteAddr());
     }
 }
