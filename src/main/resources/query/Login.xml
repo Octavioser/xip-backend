@@ -42,8 +42,8 @@
 			#{lastNm},
 			#{firstNm},
 			#{country},
-			NOW(),
-			NOW(),
+			#{termsofuse},
+			#{privacy},
 			NOW(),
 			NOW()
 		)

@@ -1,5 +1,7 @@
 package com.red.xip.login.model;
 
+import java.math.BigDecimal;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,4 +17,7 @@ public class P_Login {
 	private String lastNm;
 	private String authCd;
 	private String country;
+	
+	private BigDecimal termsofuse;
+	private BigDecimal privacy;
 }

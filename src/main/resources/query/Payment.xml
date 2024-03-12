@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.red.xip.payment.mapper.PaymentMapper">
+
+	
+	
+	<select id="orderStatusCheck" 
+		parameterType = "com.red.xip.payment.model.P_Tosspay"
+		resultType="String">
+		<![CDATA[
+			SELECT  ORDER_CD
+			FROM    XIP_ORDER
+			WHERE    USER_CD = CAST(#{userCd}AS UNSIGNED)
+			AND     PG_NAME = #{pgName}
+			AND     PAYMENT_KEY = #{paymentKey}
+			AND     ORDER_ID = #{orderId}
+		]]>
+	</select>
+
+	<select id="orderCartCheck" 
+		parameterType = "com.red.xip.payment.model.P_Tosspay"
+		resultType="String">
+		<![CDATA[
+			SELECT  SUM(C.PROD_QTY * P.PRICE) + 3000
+			FROM    XIP_CART AS C 
+			        INNER JOIN XIP_PROD_D AS PD
+                    ON  PD.PROD_CD_D = C.PROD_CD_D
+                    AND PD.SOLD_QTY < PD.TOTAL_QTY
+                    INNER JOIN XIP_PROD AS P
+                    ON  P.PROD_CD = PD.PROD_CD
+                    AND P.STATUS != '-1'
+			WHERE   USER_CD =  CAST(#{userCd}AS UNSIGNED)
+			AND     P.STATUS != '-1'
+			GROUP BY C.USER_CD
+		]]>
+	</select>
+	
+	<select id="orderCheck" 
+		parameterType = "com.red.xip.payment.model.P_Tosspay"
+		resultType="String">
+		<![CDATA[
+			SELECT  PRICE + 3000
+			FROM    XIP_PROD_D AS PD 
+			        INNER JOIN XIP_PROD AS P
+			        ON  P.PROD_CD = PD.PROD_CD
+			WHERE   PD.PROD_CD_D = #{orderMethod}
+		]]>
+	</select>
+	
+	<insert id="insertOrder"
+		parameterType = "com.red.xip.payment.model.P_Tosspay">
+		INSERT INTO XIP_ORDER(
+		    USER_CD,
+		    PG_NAME,
+		    PAYMENT_KEY,
+		    ORDER_ID,
+		    ORDER_STATUS,
+		    PAY_METHOD,
+		    ORDER_DT,
+		    CURRENCY,
+		    TOTAL_AMOUNT,
+		    SHIPPING_AMOUNT,
+		    SHIPPING_METHOD,
+		    TRACKING_NUM,
+		    SHIP_DT,
+		    ADD_LAST_NM,
+		    ADD_FIRST_NM,
+		    PHONE,
+		    COMPANY,
+		    ADD_1,
+		    ADD_2,
+		    CITY,
+		    ADD_COUNTRY,
+		    STATE,
+		    POSTAL_CD,
+		    CREAT_DT,
+		    MODIFY_DT
+		)
+		SELECT   USER_CD,
+		        #{pgName} AS PG_NAME,
+		        #{paymentKey} AS PAYMENT_KEY,
+		        #{orderId} AS OREDER_ID,
+		        '1' AS ORDER_STATUS,
+		        #{payMethod} AS PAY_METHOD,
+		        NOW() AS ORDER_DT,
+		        'KRW' AS CURRENCY,
+		        #{amount} AS TOTAL_AMOUNT,
+		        3000 AS SHIPPING_AMOUNT,
+		        'KOREA POST' AS SHIPIING_METHOD,
+		        NULL AS TRACKING_NUM,
+		        NULL AS SHIP_DT,
+		        ADD_LAST_NM,
+		        ADD_FIRST_NM,
+		        PHONE,
+		        COMPANY,
+		        ADD_1,
+		        ADD_2,
+		        CITY,
+		        ADD_COUNTRY,
+		        STATE,
+		        POSTAL_CD,
+		        NOW() AS CREAT_DT,
+		        NOW() AS MODIFY_DT
+		FROM    ADDRESSES
+		WHERE   USER_CD= CAST(#{userCd}AS UNSIGNED)
+	</insert>
+	<insert id="insertOrderD" parameterType="com.red.xip.payment.model.P_Tosspay">
+	    <selectKey keyProperty="orderCd" resultType="int" order="BEFORE">
+	        SELECT MAX(ORDER_CD) FROM XIP_ORDER WHERE USER_CD = CAST(#{userCd}AS UNSIGNED)
+	    </selectKey>
+	    
+	    INSERT INTO XIP_ORDER_D (
+	        ORDER_CD,
+			PROD_CD_D,
+			PROD_QTY,
+			CREAT_DT,
+			MODIFY_DT
+	    )
+	    <choose>
+			
+			<when test = "orderMethod == 'cart'">
+			<![CDATA[
+				SELECT  #{orderCd} AS ORDER_CD,
+						PROD_CD_D,
+						PROD_QTY,
+						NOW() AS CREAT_DT,
+						NOW() AS MODIFY_DT
+				FROM    XIP_CART AS C
+						INNER JOIN XIP_PROD_D AS PD
+	                    ON  PD.PROD_CD_D = C.PROD_CD_D
+	                    AND PD.SOLD_QTY < PD.TOTAL_QTY
+	                    INNER JOIN XIP_PROD AS P
+	                    ON  P.PROD_CD = PD.PROD_CD
+	                    AND P.STATUS != '-1'
+				WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED);
+			]]>
+			</when>
+			
+			<otherwise>
+			VALUES (
+				#{orderCd},
+				#{orderMethod},
+				1,
+				NOW(),
+				NOW()
+			);	
+			</otherwise>
+			
+		</choose>
+	</insert>
+	
+	<delete id="deleteUserCart" parameterType="com.red.xip.payment.model.P_Tosspay">
+		DELETE
+		FROM    XIP_CART
+		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED);
+	</delete>
+	
+</mapper>

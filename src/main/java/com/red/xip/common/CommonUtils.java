@@ -56,6 +56,5 @@ public class CommonUtils {
 		    realIp = servletRequest.getRemoteAddr();
 		}
 		logger.info("로그인 시도 - 클라이언트 IP: {}", realIp);
-		logger.info("###########클라이언트 IP: ",servletRequest.getRemoteAddr());
     }
 }

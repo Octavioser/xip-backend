@@ -30,6 +30,7 @@ public class ShopService {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
 
 	public List<R_AccountDetail> selectDetailAccount (P_Account param) throws Exception {
 		
@@ -102,6 +103,9 @@ public class ShopService {
 	}
 
 	public List<R_Cart> selectCart(P_Cart param) throws Exception {
+		// 솔드아웃이나 판매중지된 제품 삭제
+		mapper.deleteSoldoutCart();
+		
 		return mapper.selectCart(param);
 	}
 
@@ -162,6 +166,8 @@ public class ShopService {
 	}
 
 	public List<R_Order> selectOrder(P_Order param) throws Exception {
+		// 솔드아웃이나 판매중지된 제품 삭제
+		mapper.deleteSoldoutCart();
 		return mapper.selectOrder(param);
 	}
 
@@ -204,5 +210,4 @@ public class ShopService {
 			throw e;
 		}
 	}
-
 }

@@ -57,4 +57,6 @@ public interface ShopMapper {
 	int updateCancelOrder(P_OrderD param) throws Exception;
 
 	int updateCancellingCancel(P_OrderD param)throws Exception;
+
+	int deleteSoldoutCart() throws Exception;
 }

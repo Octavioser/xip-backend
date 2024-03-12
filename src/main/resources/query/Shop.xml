@@ -175,6 +175,19 @@
 	 	MODIFY_DT = NOW()
 	</insert>
 	
+	<delete id="deleteSoldoutCart" 
+		parameterType = "com.red.xip.shop.model.P_Cart">
+		<![CDATA[
+			DELETE  C
+            FROM    XIP_CART AS C
+                    LEFT JOIN XIP_PROD_D AS PD
+                    ON  PD.PROD_CD_D = C.PROD_CD_D
+                    LEFT JOIN XIP_PROD AS P
+                    ON  P.PROD_CD = PD.PROD_CD
+            WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY OR P.STATUS = '-1'
+		]]>
+	</delete>
+	
 	<select id="selectCart" 
 		parameterType = "com.red.xip.shop.model.P_Cart"
 		resultType="com.red.xip.shop.model.R_Cart">
@@ -319,8 +332,8 @@
 		        ON  P.PROD_CD = PD.PROD_CD
 		WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     M.USER_CD = CAST(#{userCd}AS UNSIGNED)
-	</select> 
-	
+	</select>
+	 
 	<update id ="updateCancelOrder"
 			parameterType = "com.red.xip.shop.model.P_OrderD">
 		UPDATE  XIP_ORDER
