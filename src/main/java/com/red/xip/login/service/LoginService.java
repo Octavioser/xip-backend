@@ -132,9 +132,7 @@ public class LoginService {
 				
 				param.setAuthCd(resultNum);
 				
-				int result = mapper.insertAuthCd(param);
-
-				System.out.println(result);
+				mapper.insertAuthCd(param);
 				
 				Context context = new Context();
 		        context.setVariable("resultNum", resultNum);

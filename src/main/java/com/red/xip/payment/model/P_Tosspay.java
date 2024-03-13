@@ -17,4 +17,5 @@ public class P_Tosspay {
 	private String payMethod;
 	private int orderCd;
 	private String pgName;
+	private String email;
 }

@@ -42,6 +42,7 @@ public class PaymentController {
     		}
     		
             param.setUserCd(userCd);
+            param.setEmail(email);
             
     		return service.insertOrder(param);
 		} catch (Exception e) {

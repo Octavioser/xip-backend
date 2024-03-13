@@ -22,7 +22,7 @@
 		parameterType = "com.red.xip.payment.model.P_Tosspay"
 		resultType="String">
 		<![CDATA[
-			SELECT  SUM(C.PROD_QTY * P.PRICE) + 3000
+			SELECT  SUM(C.PROD_QTY * P.PRICE)
 			FROM    XIP_CART AS C 
 			        INNER JOIN XIP_PROD_D AS PD
                     ON  PD.PROD_CD_D = C.PROD_CD_D
@@ -40,11 +40,13 @@
 		parameterType = "com.red.xip.payment.model.P_Tosspay"
 		resultType="String">
 		<![CDATA[
-			SELECT  PRICE + 3000
+			SELECT  PRICE
 			FROM    XIP_PROD_D AS PD 
 			        INNER JOIN XIP_PROD AS P
-			        ON  P.PROD_CD = PD.PROD_CD
+                    ON  P.PROD_CD = PD.PROD_CD
+                    AND P.STATUS != '-1'
 			WHERE   PD.PROD_CD_D = #{orderMethod}
+			AND     PD.SOLD_QTY < PD.TOTAL_QTY
 		]]>
 	</select>
 	
@@ -82,11 +84,11 @@
 		        #{paymentKey} AS PAYMENT_KEY,
 		        #{orderId} AS OREDER_ID,
 		        '1' AS ORDER_STATUS,
-		        #{payMethod} AS PAY_METHOD,
+		        '' AS PAY_METHOD,
 		        NOW() AS ORDER_DT,
 		        'KRW' AS CURRENCY,
 		        #{amount} AS TOTAL_AMOUNT,
-		        3000 AS SHIPPING_AMOUNT,
+		        0 AS SHIPPING_AMOUNT,
 		        'KOREA POST' AS SHIPIING_METHOD,
 		        NULL AS TRACKING_NUM,
 		        NULL AS SHIP_DT,
@@ -122,8 +124,8 @@
 			<when test = "orderMethod == 'cart'">
 			<![CDATA[
 				SELECT  #{orderCd} AS ORDER_CD,
-						PROD_CD_D,
-						PROD_QTY,
+						PD.PROD_CD_D,
+						C.PROD_QTY,
 						NOW() AS CREAT_DT,
 						NOW() AS MODIFY_DT
 				FROM    XIP_CART AS C
@@ -155,5 +157,43 @@
 		FROM    XIP_CART
 		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED);
 	</delete>
+	
+	<update id="updatePayMethod" parameterType="com.red.xip.payment.model.P_Tosspay">
+		UPDATE  XIP_ORDER
+		   SET  PAY_METHOD = IFNULL(#{payMethod}, '')
+		 WHERE  ORDER_CD = #{orderCd}
+		 AND    USER_CD = CAST(#{userCd}AS UNSIGNED);
+	</update>
+		
+	<update id="updateProdQty" parameterType="com.red.xip.payment.model.P_Tosspay">
+	<![CDATA[
+		UPDATE  XIP_PROD_D AS PD 
+                INNER JOIN XIP_ORDER_D AS OD
+                ON OD.PROD_CD_D = PD.PROD_CD_D
+           SET  PD.SOLD_QTY = PD.SOLD_QTY + OD.PROD_QTY
+        WHERE   OD.ORDER_CD = #{orderCd}
+        AND     PD.SOLD_QTY < PD.TOTAL_QTY
+    ]]>
+	</update>
+	
+	<select id="selectOrderDetails" 
+			parameterType="com.red.xip.payment.model.P_Tosspay"
+			resultType="com.red.xip.payment.model.R_PurchaseEmail">
+		SELECT  P.NAME, 
+                CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
+			    CONCAT('Amount: ', OD.PROD_QTY) AS PROD_QTY,
+                CASE O.CURRENCY
+                     WHEN 'KRW' THEN CONCAT( '₩', FORMAT(OD.PROD_QTY * P.PRICE,0) )
+                     WHEN 'USD' THEN CONCAT( '$', FORMAT(OD.PROD_QTY * P.US_PRICE,0) )    
+                     ELSE '' END AS PRICE
+        FROM    XIP_ORDER_D AS OD
+                INNER JOIN XIP_ORDER AS O
+                ON  O.ORDER_CD = OD.ORDER_CD
+                LEFT OUTER JOIN XIP_PROD_D AS PD
+                ON  PD.PROD_CD_D = OD.PROD_CD_D
+                LEFT OUTER JOIN XIP_PROD AS P
+                ON  P.PROD_CD = PD.PROD_CD
+		WHERE   OD.ORDER_CD = #{orderCd}
+	</select>
 	
 </mapper>
