@@ -21,7 +21,6 @@ import com.red.xip.payment.model.P_Tosspay;
 import com.red.xip.payment.model.R_PurchaseEmail;
 import com.red.xip.payment.model.R_Tosspay;
 import com.red.xip.payment.model.TossPaymentsResponse;
-import com.red.xip.xipengineering.model.R_ShipDetails;
 
 import org.springframework.beans.factory.annotation.Value;
 

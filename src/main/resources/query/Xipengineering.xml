@@ -112,7 +112,7 @@
 		<![CDATA[
 			SELECT  D.PROD_CD_D,
 			        P.NAME,
-			        CONCAT('Size: ',D.PROD_SIZE) AS PROD_SIZE,
+			        CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
 			        CONCAT('Amount: ',D.PROD_QTY) AS PROD_QTY
 			FROM    XIP_ORDER_D AS D
 			        INNER JOIN XIP_INCU AS X 
