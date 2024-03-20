@@ -5,6 +5,8 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.red.xip.common.CommonUtils;
+import com.red.xip.util.model.APIResult;
 import com.red.xip.xipengineering.model.P_Canceled;
 import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_NewProd;
@@ -32,11 +35,13 @@ public class XipengineeringController {
 	@Autowired
 	XipengineeringService service;
 	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+	
 	// C100생성 R000출력 U200갱신 D300삭제
 	// selectIncuCheck  유저정보들 갖고오기
 	@PostMapping("/incuR001")
 	@ResponseBody
-	public Object selectIncuCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectIncuCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_XLogin param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -49,20 +54,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setEmail(email);
 			param.setUserCd(userCd);
 			
-			return 1; 
+			return APIResult.success(1); 
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -70,7 +75,7 @@ public class XipengineeringController {
 	// selectUsers  회원조회
 	@PostMapping("/incuR002")
 	@ResponseBody
-	public Object selectUsers(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectUsers(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_User param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -83,20 +88,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setEmail(email);
 			param.setUserCd(userCd);
 			
-			return service.selectUsers(param);
+			return APIResult.success(service.selectUsers(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -104,7 +109,7 @@ public class XipengineeringController {
 	// selectOrders  주문내역조회
 	@PostMapping("/incuR003")
 	@ResponseBody
-	public Object selectOrders(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectOrders(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Orders param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -117,20 +122,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectOrders(param);
+			return APIResult.success(service.selectOrders(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -138,7 +143,7 @@ public class XipengineeringController {
 	// selectPurchaseOrder  운송장 등록을 위한 주문내역
 	@PostMapping("/incuR004")
 	@ResponseBody
-	public Object selectPurchaseOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectPurchaseOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_PurchaseOrders param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -151,20 +156,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectPurchaseOrder(param);
+			return APIResult.success(service.selectPurchaseOrder(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -172,7 +177,7 @@ public class XipengineeringController {
 	// selectTrackingInfo  운송장 등록 다이얼로그
 	@PostMapping("/incuR005")
 	@ResponseBody
-	public Object selectTracking(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectTracking(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -185,20 +190,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectTracking(param);
+			return APIResult.success(service.selectTracking(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -206,7 +211,7 @@ public class XipengineeringController {
 	// updateTrackingNum  운송장 등록 다이얼로그
 	@PostMapping("/incuU201")
 	@ResponseBody
-	public Object updateTrackingNum (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateTrackingNum (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -219,20 +224,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.updateTrackingNum(param);
+			return APIResult.success(service.updateTrackingNum(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -241,7 +246,7 @@ public class XipengineeringController {
 	// selectShipped  발송완료 메뉴
 	@PostMapping("/incuR006") 
 	@ResponseBody
-	public Object selectShipped(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectShipped(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shipped param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -254,20 +259,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectShipped(param);
+			return APIResult.success(service.selectShipped(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -275,7 +280,7 @@ public class XipengineeringController {
 	// selectCancelling  취소요청
 	@PostMapping("/incuR007") 
 	@ResponseBody
-	public Object selectCancelling(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectCancelling(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cancelling param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -288,20 +293,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectCancelling(param);
+			return APIResult.success(service.selectCancelling(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -309,7 +314,7 @@ public class XipengineeringController {
 	// selectDetailCancelling  취소요청 메뉴에서 취소버튼클릭시
 	@PostMapping("/incuR008") 
 	@ResponseBody
-	public Object selectDetailCancelling(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectDetailCancelling(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cancelling param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -322,20 +327,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectDetailCancelling(param);
+			return APIResult.success(service.selectDetailCancelling(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -343,7 +348,7 @@ public class XipengineeringController {
 	// updateTrackingNum  운송장 등록 다이얼로그
 	@PostMapping("/incuU202")
 	@ResponseBody
-	public Object updateCanceled (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateCanceled (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cancelling param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -356,20 +361,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.updateCanceled(param);
+			return APIResult.success(service.updateCanceled(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -377,7 +382,7 @@ public class XipengineeringController {
 	// selectCanceled  취소내역
 	@PostMapping("/incuR009")
 	@ResponseBody
-	public Object selectCanceled(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectCanceled(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Canceled param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -390,20 +395,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectCanceled(param);
+			return APIResult.success(service.selectCanceled(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -411,7 +416,7 @@ public class XipengineeringController {
 	// selectProdOrder  취소내역
 	@PostMapping("/incuR010")
 	@ResponseBody
-	public Object selectProdOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectProdOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_ProdOrder param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -424,20 +429,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.selectProdOrder(param);
+			return APIResult.success(service.selectProdOrder(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -445,7 +450,7 @@ public class XipengineeringController {
 	// updateTrackingNum  운송장 등록 다이얼로그
 	@PostMapping("/incuU203")
 	@ResponseBody
-	public Object updateProdOrder (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateProdOrder (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_ProdOrder param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -458,20 +463,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.updateProdOrder(param);
+			return APIResult.success(service.updateProdOrder(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -479,7 +484,7 @@ public class XipengineeringController {
 	// insertProdItem  제품등록
 	@PostMapping("/incuC101")
 	@ResponseBody
-	public Object insertProdItem (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult insertProdItem (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_NewProd param) throws Exception {
 		try {
 			// 쿠키 정보 갖고오기
@@ -492,20 +497,20 @@ public class XipengineeringController {
 			String roleType = userInfo.get("roleType");
 			
 			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			if(!"X".equals(roleType)) {
-				return -2;
+				return APIResult.tokenFail();
 			}
 			
 			param.setUserCd(userCd);
 			param.setEmail(email);
 			
-			return service.insertProdItem(param);
+			return APIResult.success(service.insertProdItem(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	

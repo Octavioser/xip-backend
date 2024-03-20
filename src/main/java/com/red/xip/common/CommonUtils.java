@@ -24,6 +24,7 @@ public class CommonUtils {
             }
     		String token = authorizationHeader.substring(7); // "Bearer "를 제외한 토큰 부분을 추출합니다.
     		
+    		// 토큰 검증 후 데이터 가져오기
     		Claims claims = Jwts.parserBuilder().setSigningKey(SecurityConstants.JWT_SECRET_KEY).build().parseClaimsJws(token).getBody();
     		
             String userCd = claims.getSubject();              // 유저 번호 꺼내기

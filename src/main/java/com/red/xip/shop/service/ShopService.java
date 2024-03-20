@@ -3,6 +3,8 @@ package com.red.xip.shop.service;
 import java.util.Collections;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class ShopService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
 	public List<R_AccountDetail> selectDetailAccount (P_Account param) throws Exception {
 		
@@ -41,13 +44,9 @@ public class ShopService {
 	@Transactional(rollbackFor = Exception.class)
 	public int updateAccountInfoNm(P_Account param) throws Exception {
 		try {
-			int result = mapper.updateAccountInfoNm(param);
-			if (result != 1) {
-				throw new RuntimeException("######### Expected updateAccountInfoNm count 1, but was " + result);
-			}
-			return result;
+			return mapper.updateAccountInfoNm(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -59,17 +58,13 @@ public class ShopService {
 			if(resultData.size() > 0 && passwordEncoder.matches(param.getPw(), resultData.get(0).getPw()) ) {
 				param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
 				param.setNewPw(String.valueOf(passwordEncoder.encode(param.getNewPw())));
-				int result = mapper.updateAccountInfoPw(param);
-				if (result != 1) {
-					throw new RuntimeException("######### Expected updateAccountInfoPw count 1, but was " + result);
-				}
-				return result;
+				return mapper.updateAccountInfoPw(param);
 			}
 			else {
 				return -1;
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}	
 	}
@@ -79,17 +74,28 @@ public class ShopService {
 		try {
 			return mapper.insertAdd(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 	
 	public List<R_Shop> selectProdList(P_Shop param) throws Exception {
-		return mapper.selectProdList(param);
+		try {
+			return mapper.selectProdList(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
 	}
 
 	public List<R_Shop> selectDetailProdList(P_Shop param) throws Exception {
-		return mapper.selectDetailProdList(param);
+		
+		try {
+			return mapper.selectDetailProdList(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
 	}
 
 	// 제품 상세페이지에서 cart에 담을때
@@ -98,16 +104,20 @@ public class ShopService {
 		try {
 			return mapper.insertCart(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
 	public List<R_Cart> selectCart(P_Cart param) throws Exception {
 		// 솔드아웃이나 판매중지된 제품 삭제
-		mapper.deleteSoldoutCart();
-		
-		return mapper.selectCart(param);
+		try {
+			mapper.deleteSoldoutCart();
+			return mapper.selectCart(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
@@ -128,7 +138,7 @@ public class ShopService {
 			}
 			return 1;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -136,13 +146,9 @@ public class ShopService {
 	@Transactional(rollbackFor = Exception.class)
 	public int deleteWebauthn(P_Account param) throws Exception {
 		try {
-			int result = mapper.deleteWebauthn(param);
-			if (result != 1) {
-				throw new RuntimeException("######### Expected deleteWebauthn count 1, but was " + result);
-			}
-			return result;
+			return mapper.deleteWebauthn(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -150,60 +156,57 @@ public class ShopService {
 	@Transactional(rollbackFor = Exception.class)
 	public int deleteAccount(P_Account param) throws Exception {
 		try {
-			int result = mapper.deleteAccount(param);
-			if (result != 1) {
-				throw new RuntimeException("######### Expected deleteAccount count 1, but was " + result);
-			}
-			return result;
+			return mapper.deleteAccount(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
-	public List<R_Order> selectOrder(P_Order param) throws Exception {
-		// 솔드아웃이나 판매중지된 제품 삭제
-		mapper.deleteSoldoutCart();
-		return mapper.selectOrder(param);
+	public List<R_Order> selectOrder(P_Order param) throws Exception {		
+		try {
+			return mapper.selectOrder(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+		
 	}
 
 	public List<R_OrderD> selectOrderDetails(P_OrderD param) throws Exception {
-		List<orderDetails> list =  mapper.selectOrderDetailProducts(param);
-		List<R_OrderD> result = mapper.selectOrderDetails(param);
-		if(list.size() > 0 && result.size() > 0) {
-			result.get(0).setOrderDetails(list);
-			return result;
-		}
-		else {
-			return Collections.emptyList();
+		try {
+			List<orderDetails> list =  mapper.selectOrderDetailProducts(param);
+			List<R_OrderD> result = mapper.selectOrderDetails(param);
+			if(list.size() > 0 && result.size() > 0) {
+				result.get(0).setOrderDetails(list);
+				return result;
+			}
+			else {
+				return Collections.emptyList();
+			}
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCancelOrder(P_OrderD param) throws Exception {
 		try {
-			int result = mapper.updateCancelOrder(param);
-			if (result != 1) {
-			    throw new RuntimeException("######### Expected updateCancleOrder count 1, but was " + result);
-			}
-			return result;
+			return mapper.updateCancelOrder(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCancellingCancel(P_OrderD param) throws Exception {
 		try {
-			int result = mapper.updateCancellingCancel(param);
-			if (result != 1) {
-			    throw new RuntimeException("######### Expected updateCancellingCancel count 1, but was " + result);
-			}
-			return result;
+			return mapper.updateCancellingCancel(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw e;
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 }

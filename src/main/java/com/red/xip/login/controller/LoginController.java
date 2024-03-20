@@ -4,11 +4,14 @@ package com.red.xip.login.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.red.xip.login.model.P_Login;
 import com.red.xip.login.model.P_WebAuth;
 import com.red.xip.login.service.LoginService;
+import com.red.xip.util.model.APIResult;
 
 @RestController
 @RequestMapping("/login")
@@ -20,145 +23,147 @@ public class LoginController {
 	@Autowired
 	LoginService service;
 	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+	
 	// 로그인
 	@PostMapping("/loginR001")
 	@ResponseBody
-	public Object getLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult getLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.getLoginCheck(param);
+    		return APIResult.success(service.getLoginCheck(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// 이메일 있는지 체크
 	@PostMapping("/loginR002")
 	@ResponseBody
-	public Object selectEmailCheckAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectEmailCheckAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.selectEmailCheckAuthCode(param);
+    		return APIResult.success(service.selectEmailCheckAuthCode(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// 인증코드 체크
 	@PostMapping("/loginR003")
 	@ResponseBody
-	public Object selectEmailAuthCodeCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectEmailAuthCodeCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.selectEmailAuthCodeCheck(param);
+    		return APIResult.success(service.selectEmailAuthCodeCheck(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// 회원가입
 	@PostMapping("/loginC101")
 	@ResponseBody
-	public Object insertCreateAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult insertCreateAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.insertCreateAccount(param);
+    		return APIResult.success(service.insertCreateAccount(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// selectWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
 	@PostMapping("/loginR004")
 	@ResponseBody
-	public Object selectWebAuthCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectWebAuthCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
-    		return service.selectWebAuthCheck(param);
+    		return APIResult.success(service.selectWebAuthCheck(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// selectWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
 	@PostMapping("/loginR005")
 	@ResponseBody
-	public Object selectWebAuthCreateItem(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectWebAuthCreateItem(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
-    		return service.selectWebAuthCreateItem(param);
+    		return APIResult.success(service.selectWebAuthCreateItem(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// updateWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
 	@PostMapping("/loginU201")
 	@ResponseBody
-	public Object updateSaveWebAuth(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateSaveWebAuth(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
-    		return service.updateSaveWebAuth(param);
+    		return APIResult.success(service.updateSaveWebAuth(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// selectWebAuthLoginCheck  webAuth로 로그인 한거 검증
 	@PostMapping("/loginR006")
 	@ResponseBody
-	public Object selectWebAuthLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectWebAuthLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
-    		return service.selectWebAuthLoginCheck(param);
+    		return APIResult.success(service.selectWebAuthLoginCheck(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// 이메일 있는지 체크
 	@PostMapping("/loginR007")
 	@ResponseBody
-	public Object selectEmailCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectEmailCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
-    		return service.selectEmailCheck(param);
+    		return APIResult.success(service.selectEmailCheck(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	@PostMapping("/loginR008")
 	@ResponseBody
-	public Object selectForgotPwAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectForgotPwAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.selectForgotPwAuthCode(param);
+    		return APIResult.success(service.selectForgotPwAuthCode(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
 	// updatePw  비밀번호변경
 	@PostMapping("/loginU202")
 	@ResponseBody
-	public Object updatePw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updatePw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
-    		return service.updatePw(param);
+    		return APIResult.success(service.updatePw(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -1;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 }

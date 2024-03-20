@@ -1,9 +1,10 @@
 package com.red.xip.xipengineering.service;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,13 +49,15 @@ public class XipengineeringService {
 	
 	@Autowired // 이메일템플릿
     private TemplateEngine templateEngine;
+	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 
 	public List<R_User> selectUsers(P_User param) throws Exception {
 		try {
 			return mapper.selectUsers(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -62,8 +65,8 @@ public class XipengineeringService {
 		try {
 			return mapper.selectOrders(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -71,8 +74,8 @@ public class XipengineeringService {
 		try {
 			return mapper.selectPurchaseOrder(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -83,8 +86,8 @@ public class XipengineeringService {
 			result.get(0).setTrackingProd(mapper.selectTrackingProd(param));  
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -92,10 +95,6 @@ public class XipengineeringService {
 	public int updateTrackingNum(P_Tracking param) throws Exception{
 		try {
 			int result = mapper.updateTrackingNum(param); 
-			
-			if (result != 1) {
-	            throw new RuntimeException("######### Expected updateTrackingNum count 1, but was " + result);
-	        }
 			
 			R_ShipInfo shipItem = mapper.selectShipInfo(param);
 			
@@ -116,7 +115,7 @@ public class XipengineeringService {
 			
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -125,8 +124,8 @@ public class XipengineeringService {
 		try {
 			return mapper.selectShipped(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -134,34 +133,27 @@ public class XipengineeringService {
 		try {
 			return mapper.selectCancelling(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 	
-	public List<R_DetailCancelling> selectDetailCancelling(P_Cancelling param) {
+	public List<R_DetailCancelling> selectDetailCancelling(P_Cancelling param) throws Exception{
 		try {
 			return mapper.selectDetailCancelling(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCanceled(P_Cancelling param) throws Exception{
 		try {
-			int result = mapper.updateCancelStatus(param);
-			if (result != 1) {
-	            throw new RuntimeException("######### Expected updateCancelStatus count 1, but was " + result);
-	        }
-			result = mapper.insertCancel(param);
-			if (result != 1) {
-	            throw new RuntimeException("######### Expected insertCancel count 1, but was " + result);
-	        }
-			return result;
+			mapper.updateCancelStatus(param);
+			return mapper.insertCancel(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -170,8 +162,8 @@ public class XipengineeringService {
 		try {
 			return mapper.selectCanceled(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -179,8 +171,8 @@ public class XipengineeringService {
 		try {
 			return mapper.selectProdOrder(param);
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -193,7 +185,7 @@ public class XipengineeringService {
 	        }
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -233,12 +225,11 @@ public class XipengineeringService {
 				s3Service.uploadBase64Image(imgItem.get("image" + index), filePath);
 			}
 			param.setProdDSrc(prodDetailImgSrc);
-			mapper.insertProdDImg(param);
+			return mapper.insertProdDImg(param);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
-        return 1;
 	}
 }

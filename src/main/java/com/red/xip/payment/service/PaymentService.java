@@ -39,7 +39,7 @@ public class PaymentService {
 	@Autowired // 이메일템플릿
     private TemplateEngine templateEngine;
 	
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 
 	@Transactional(rollbackFor = Exception.class)
@@ -108,7 +108,7 @@ public class PaymentService {
 			result.setOrderCd(orderCd);
 			return result;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -142,8 +142,8 @@ public class PaymentService {
             
         } catch (Exception e) {
             // 로그 기록 또는 에러 처리
-            // 여기서 발생한 예외는 롤백에 영향을 주지 않음
-        	logger.error("결제승인이후 동작 중 에러 발생", e);
+        	LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+        	// throw e를 주석하여 발생한 예외는 롤백에 영향을 주지 않음
         }
     }
 

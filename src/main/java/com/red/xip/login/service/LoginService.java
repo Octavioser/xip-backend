@@ -15,6 +15,8 @@ import java.util.Random;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -79,6 +81,7 @@ public class LoginService {
 	
 	private final WebAuthnManager webAuthnManager = WebAuthnManager.createNonStrictWebAuthnManager();
 
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
 	
 	public List<R_Login> getLoginCheck(P_Login param) throws Exception {
 		try {
@@ -102,13 +105,12 @@ public class LoginService {
 				return resultData;
 			}
 			else {
-				
 				return Collections.emptyList();
 			}
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -149,33 +151,47 @@ public class LoginService {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			return -1;
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
 	// 회원가입
 	@Transactional(rollbackFor = Exception.class)
-	public int insertCreateAccount(P_Login param) throws Exception {
+	public List<R_Login> insertCreateAccount(P_Login param) throws Exception {
 		try {
 			int checkEmail = mapper.selectEmailCheck(param);
 			if(checkEmail > 0) {
 				// 계정이 있을 경우
-				return -1;
+				return Collections.emptyList();
 			}
 			param.setPw(String.valueOf(passwordEncoder.encode(param.getPw())));
 			int count =	mapper.selectEmailAuthCodeCheck(param);
-			if(count == 0) {
-				return -1;
+			if(count == 0) { // 인증코드가 맞지 않을 경우
+				return Collections.emptyList();
 			}
 
-			int result = mapper.insertCreateAccount(param);
-			if (result != 1) {
-				throw new RuntimeException("######### Expected insertCreateAccount count 1, but was " + result);
-			}
-			return result;
+			mapper.insertCreateAccount(param); // 회원가입 데이터 저장
+			
+			List<R_Login> resultData = mapper.getLoginCheck(param);
+			// 인증 성공시
+			Date now = new Date();
+			String token = Jwts.builder()
+					.setSubject(resultData.get(0).getUserCd())       // 토큰의 주제 설정 (예: 사용자 ID)
+					.claim("email", resultData.get(0).getEmail())     // 사용자 이메일 추가
+					.claim("roleType", resultData.get(0).getRoleType())     // 사용자 권한추가 'U'
+					.setIssuedAt(now)                                // 토큰 발급일
+					.setExpiration(new Date(now.getTime() + Duration.ofHours(12).toMillis())) // 토큰 만료일
+				    .signWith(SecurityConstants.JWT_SECRET_KEY) // 서명 알고리즘과 비밀 키 설정
+				    .compact();	
+			resultData.get(0).setToken(token);    // 토큰넣어주기
+			resultData.get(0).setPw(null);
+			resultData.get(0).setUserCd(null);
+			
+			return resultData;
+			
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 		
@@ -188,7 +204,7 @@ public class LoginService {
 			return count;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			return -1;
 		}
 	}
@@ -216,10 +232,7 @@ public class LoginService {
 			        param.setChallenge(challenge);
 			        param.setUserCd(result.get(0).getUserCd()); 
 			        
-			        int resultItem = mapper.updateChallenge(param);
-					if (resultItem != 1) {
-						throw new RuntimeException("######### Expected updateChallenge count 1, but was " + resultItem);
-					}
+			        mapper.updateChallenge(param);
 				}
 				result.get(0).setUserCd(null);
 				result.get(0).setPw(null);
@@ -234,8 +247,8 @@ public class LoginService {
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 		
 	}
@@ -271,11 +284,7 @@ public class LoginService {
 					// challange 저장하기
 			        param.setChallenge(Challenge);
 			        
-			        int resultItem = mapper.createWebAuthnSaveChallenge(param); // 챌린지 값이외에 null값으로 변경(초기화)
-					if (resultItem != 1) {
-						throw new RuntimeException("######### Expected createWebAuthnSaveChallenge count 1, but was " + resultItem);
-					}
-
+			        mapper.createWebAuthnSaveChallenge(param); // 챌린지 값이외에 null값으로 변경(초기화)
 				}
 				else {
 					return Collections.emptyList();
@@ -294,7 +303,7 @@ public class LoginService {
 				return Collections.emptyList();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -354,17 +363,13 @@ public class LoginService {
 			//  clientData 맞는지 확인
 	        if("webauthn.create".equals(type) && appOrigin.equals(origin) && savedChallenge.equals(challenge)) {
 	        	param.setUserCd(result.get(0).getUserCd());
-	        	int resultItem = mapper.updateSaveWebAuth(param);
-	        	if (resultItem != 1) {
-	    			throw new RuntimeException("######### Expected updateSaveWebAuth count 1, but was " + resultItem);
-	    		}
-	        	return resultItem;
+	        	return mapper.updateSaveWebAuth(param);
 	        }
 	        
 	        return -1;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -471,7 +476,7 @@ public class LoginService {
 				return Collections.emptyList();
 			}
 			
-			// 인증성공시
+			// 인증 성공시
 			Date now = new Date();
 			String token = Jwts.builder()
 					.setSubject(result.get(0).getUserCd())       // 토큰의 주제 설정 (예: 사용자 ID)
@@ -493,8 +498,8 @@ public class LoginService {
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 	
@@ -507,7 +512,6 @@ public class LoginService {
 			
 			// 회원가입이 되어있느지
 			if(!resultData.isEmpty() && resultData.size() > 0) {
-				
 				// 가입입된 이메일이랑 webauth 등록했는지
 				if(!"".equals(CommonUtils.stringIfNull(resultData.get(0).getEmail())) && 
 						!"".equals(CommonUtils.stringIfNull(resultData.get(0).getWebAuthId()))
@@ -526,28 +530,21 @@ public class LoginService {
 			        
 			        resultData.get(0).setUserCd(null);
 			        
-			        int result = mapper.updateChallenge(param);
-					
-					if (result != 1) {
-						throw new RuntimeException("######### Expected updateChallenge count 1, but was " + result);
-					}
+			        mapper.updateChallenge(param);
 				}
-				// 회원가입은 되어있지만 webauth이 등록되지 않은 사용자
-				else if(!"".equals(CommonUtils.stringIfNull(resultData.get(0).getEmail()))){
-					
-				}
-				
+				// 등록이 안되어있는 사람 result값 리턴
 				resultData.get(0).setUserCd(null);
 				return resultData;
 			}
 			else {
+				// 회원가입이 안되어 있는 사람
 				return Collections.emptyList();
 			}
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			return Collections.emptyList();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
 
@@ -589,7 +586,7 @@ public class LoginService {
 			
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
@@ -609,14 +606,9 @@ public class LoginService {
 				return -1;
 			}
 			
-			int result = mapper.updatePw(param);
-			
-			if (result != 1) {
-				throw new RuntimeException("######### Expected updatePw count 1, but was " + result);
-			}
-			return result;
+			return mapper.updatePw(param);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}

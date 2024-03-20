@@ -5,6 +5,8 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +21,7 @@ import com.red.xip.shop.model.P_Order;
 import com.red.xip.shop.model.P_OrderD;
 import com.red.xip.shop.model.P_Shop;
 import com.red.xip.shop.service.ShopService;
+import com.red.xip.util.model.APIResult;
 
 @RestController
 @RequestMapping("/shop")
@@ -27,11 +30,13 @@ public class ShopController {
 	@Autowired
 	ShopService service;
 	
+	private final Logger LOG = LoggerFactory.getLogger(getClass());
+	
 	// C100생성 R000출력 U200갱신 D300삭제
 	// shopDetailAccount
 	@PostMapping("/shopR001")
 	@ResponseBody
-	public Object selectDetailAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectDetailAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -42,16 +47,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             param.setEmail(email);
             
-    		return service.selectDetailAccount(param);
+    		return APIResult.success(service.selectDetailAccount(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -59,7 +64,7 @@ public class ShopController {
 	// updateAccountInfoNm
 	@PostMapping("/shopU201")
 	@ResponseBody
-	public Object updateAccountInfoNm(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateAccountInfoNm(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -70,19 +75,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
+            param.setEmail(email);
             
-            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
-    			return -1;
-    		}
-            
-    		return service.updateAccountInfoNm(param);
+    		return APIResult.success(service.updateAccountInfoNm(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -90,7 +92,7 @@ public class ShopController {
 	// updateAccountInfoNm
 	@PostMapping("/shopU202")
 	@ResponseBody
-	public Object updateAccountInfoPw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateAccountInfoPw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -101,23 +103,17 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
-    			return -1;
-    		}
-            int result = service.updateAccountInfoPw(param);
+            param.setEmail(email);
             
-            if(result < 1) {
-            	return -1;
-            }
-    		return result;
+    		return APIResult.success(service.updateAccountInfoPw(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 		
@@ -125,7 +121,7 @@ public class ShopController {
 	// insertAdd
 	@PostMapping("/shopC101")
 	@ResponseBody
-	public Object insertAdd(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult insertAdd(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -136,25 +132,15 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
-            
-            if( !( CommonUtils.stringIfNull(email).equals(param.getEmail() )) ) { // 이메일과 토큰이메일이 일치하는지 확인
-    			return -1;
-    		}
-            
-            int result = service.insertAdd(param);
-            
-            if(result < 1) {
-            	return -1;
-            }
-            
-    		return result;
+
+    		return APIResult.success(service.insertAdd(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -162,26 +148,37 @@ public class ShopController {
 	// selectProdList
 	@PostMapping("/shopR002")
 	@ResponseBody
-	public Object selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
-		CommonUtils.ipLog(servletRequest);
-    	return service.selectProdList(param);
+		try {
+			CommonUtils.ipLog(servletRequest);
+	    	return APIResult.success(service.selectProdList(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
 	}
 	
 	// C100생성 R000출력 U200갱신 D300삭제
 	// selectDetailProdList
 	@PostMapping("/shopR003")
 	@ResponseBody
-	public Object selectDetailProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectDetailProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
-    	return service.selectDetailProdList(param);
+		try {
+			return APIResult.success(service.selectDetailProdList(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+    	
 	}
 	
 	// C100생성 R000출력 U200갱신 D300삭제
 	// insertAdd
 	@PostMapping("/shopC102")
 	@ResponseBody
-	public Object insertCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult insertCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -192,21 +189,15 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
-            
-            int result = service.insertCart(param);
-            
-            if(result < 1) {
-            	return -1;
-            }
-            
-    		return result;
+
+    		return APIResult.success(service.insertCart(param));
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -214,7 +205,7 @@ public class ShopController {
 	// selectCart
 	@PostMapping("/shopR004")
 	@ResponseBody
-	public Object selectCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cart param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -225,16 +216,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.selectCart(param);
+            return APIResult.success(service.selectCart(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -242,7 +233,7 @@ public class ShopController {
 	// updateCartQty
 	@PostMapping("/shopU203")
 	@ResponseBody
-	public Object updateCartQty(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateCartQty(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cart param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -253,16 +244,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.updateCartQty(param);
+            return APIResult.success(service.updateCartQty(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -270,7 +261,7 @@ public class ShopController {
 	// deleteWebauthn
 	@PostMapping("/shopD301")
 	@ResponseBody
-	public Object deleteWebauthn(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult deleteWebauthn(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -281,16 +272,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.deleteWebauthn(param);
+            return APIResult.success(service.deleteWebauthn(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -298,7 +289,7 @@ public class ShopController {
 	// deleteAccount
 	@PostMapping("/shopD302")
 	@ResponseBody
-	public Object deleteAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult deleteAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -309,16 +300,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.deleteAccount(param);
+            return APIResult.success(service.deleteAccount(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -326,7 +317,7 @@ public class ShopController {
 	// selectCart
 	@PostMapping("/shopR005")
 	@ResponseBody
-	public Object selectOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Order param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -337,16 +328,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.selectOrder(param);
+            return APIResult.success(service.selectOrder(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -354,7 +345,7 @@ public class ShopController {
 	// selectCart
 	@PostMapping("/shopR006")
 	@ResponseBody
-	public Object selectOrderDetails(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult selectOrderDetails(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -365,16 +356,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.selectOrderDetails(param);
+            return APIResult.success(service.selectOrderDetails(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -382,7 +373,7 @@ public class ShopController {
 	// updateCartQty
 	@PostMapping("/shopU204")
 	@ResponseBody
-	public Object updateCancelOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateCancelOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -393,16 +384,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.updateCancelOrder(param);
+            return APIResult.success(service.updateCancelOrder(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 	
@@ -410,7 +401,7 @@ public class ShopController {
 	// updateCartQty
 	@PostMapping("/shopU205")
 	@ResponseBody
-	public Object updateCancellingCancel(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+	public APIResult updateCancellingCancel(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
     		// 쿠키 정보 갖고오기
@@ -421,16 +412,16 @@ public class ShopController {
     		String email = userInfo.get("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return -2;
+    			return APIResult.tokenFail();
     		}
     		
             param.setUserCd(userCd);
             
-            return service.updateCancellingCancel(param);
+            return APIResult.success(service.updateCancellingCancel(param));
             
 		} catch (Exception e) {
-			e.printStackTrace();
-			return -2;  // -1 에러 -2 에러 및 로그아웃
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
 	}
 }
