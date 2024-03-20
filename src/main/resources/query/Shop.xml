@@ -198,7 +198,8 @@
 			        M.IMAGE_SRC,
 			        D.PROD_SIZE,
 			        C.PROD_QTY,
-			        D.PROD_CD_D    
+			        D.PROD_CD_D,
+			        D.TOTAL_QTY - D.SOLD_QTY AS MAX_QTY 
 			FROM    XIP_CART AS C
 			        INNER JOIN XIP_PROD_D AS D
 			        ON  D.PROD_CD_D = C.PROD_CD_D
@@ -212,19 +213,26 @@
 	</select>
 	
 	<update id ="updateCartQty"
-			parameterType = "com.red.xip.shop.model.P_Cart">
-		UPDATE  XIP_CART
-		   SET  PROD_QTY = CASE WHEN #{qtyChangeType} = 'UP' THEN PROD_QTY + 1
-		   						WHEN #{qtyChangeType} = 'DOWN' THEN PROD_QTY -1
-		   						ELSE PROD_QTY END
-		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED)
-		AND     PROD_CD_D= #{prodCdD}
+			parameterType = "com.red.xip.shop.model.CartList">
+		UPDATE  XIP_CART AS M
+				INNER JOIN XIP_PROD_D AS PD
+                ON  PD.PROD_CD_D = M.PROD_CD_D
+		   SET  M.PROD_QTY = CASE WHEN PD.SOLD_QTY >= PD.TOTAL_QTY THEN 0
+                                  WHEN M.PROD_QTY + CAST(#{prodQty} AS INT) > (PD.TOTAL_QTY - PD.SOLD_QTY) THEN PD.TOTAL_QTY - PD.SOLD_QTY
+                                  WHEN 1 > M.PROD_QTY + CAST(#{prodQty} AS INT) THEN 0
+                                  ELSE M.PROD_QTY + CAST(#{prodQty} AS INT) END 
+		WHERE   M.USER_CD = CAST(#{userCd}AS UNSIGNED)
+		AND     M.PROD_CD_D = #{prodCdD}    
 	</update>
 	
 	<delete id ="deleteCartQty"
-			parameterType = "com.red.xip.shop.model.P_Cart">
-		DELETE FROM XIP_CART WHERE USER_CD = CAST(#{userCd}AS UNSIGNED) AND PROD_CD_D= #{prodCdD};
+			parameterType = "com.red.xip.shop.model.CartList">
+		DELETE  
+		FROM    XIP_CART
+		WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED) 
+		AND     PROD_CD_D = #{prodCdD}
 	</delete>
+	
 	
 	<select id="selectCartQty" 
 		parameterType = "com.red.xip.shop.model.P_Cart"

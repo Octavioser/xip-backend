@@ -4,8 +4,9 @@
 <mapper namespace="com.red.xip.scheduler.mapper.SchedulerMapper">
 
 	<delete id ="deleteEmailAuthCode">
+	# 이메일 인증 코드의 유효성을 마지막 단계에서 다시 확인하여 하루전
 	<![CDATA[
-		DELETE FROM EMAIL_AUTH_CODE WHERE MODIFY_DT <=(NOW() - INTERVAL 10 MINUTE) 
+		DELETE FROM EMAIL_AUTH_CODE WHERE MODIFY_DT <= (NOW() - INTERVAL 1 DAY)
 	]]>
 	</delete>
 	

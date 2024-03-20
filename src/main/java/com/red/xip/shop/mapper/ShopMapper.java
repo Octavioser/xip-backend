@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.red.xip.shop.model.CartList;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
 import com.red.xip.shop.model.P_Order;
@@ -38,11 +39,13 @@ public interface ShopMapper {
 
 	List<R_Cart> selectCart(P_Cart param) throws Exception;
 
-	int updateCartQty(P_Cart param) throws Exception;
-
-	int deleteCartQty(P_Cart param) throws Exception;
+	int updateCartQty(CartList detailItem) throws Exception;
+	
+	int deleteCart(P_Cart param) throws Exception;
 
 	int selectCartQty(P_Cart param) throws Exception;
+	
+	int deleteCartQty(CartList detailItem) throws Exception;
 
 	int deleteWebauthn(P_Account param) throws Exception;
 
@@ -59,4 +62,5 @@ public interface ShopMapper {
 	int updateCancellingCancel(P_OrderD param)throws Exception;
 
 	int deleteSoldoutCart() throws Exception;
+
 }

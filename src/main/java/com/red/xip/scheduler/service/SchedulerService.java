@@ -13,7 +13,7 @@ public class SchedulerService {
 	@Autowired
 	SchedulerMapper mapper;
 					 //초 분 시  
-	@Scheduled(cron = "0 41 21 * * ?")
+	@Scheduled(cron = "0 0 5 * * ?")
 	public void deleteAuthCode() {
 		mapper.deleteEmailAuthCode();
 	}

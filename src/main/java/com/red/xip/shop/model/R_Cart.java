@@ -18,4 +18,5 @@ public class R_Cart {
 	private String prodCdD;
 	private int prodQty;
 	private BigDecimal usPrice;
+	private int maxQty;
 }

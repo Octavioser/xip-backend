@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.red.xip.shop.model.R_Shop;
 import com.red.xip.shop.model.orderDetails;
 import com.red.xip.shop.mapper.ShopMapper;
+import com.red.xip.shop.model.CartList;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
 import com.red.xip.shop.model.P_Order;
@@ -112,25 +113,20 @@ public class ShopService {
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCartQty(P_Cart param) throws Exception {
 		try {
-			int result;
-			int cartQty = param.getProdQty();
-			if(cartQty < 1) { // 제품 갯수가 0일때는 삭제
-				result = mapper.deleteCartQty(param);
-				if (result != 1) {
-					throw new RuntimeException("######### Expected deleteCartQty count 1, but was " + result);
+			List<CartList> item = param.getCartList();
+			CartList detailItem;
+			
+			for(int i=0; i<item.size(); i++) {
+				detailItem = item.get(i); 
+				detailItem.setUserCd(param.getUserCd());
+				if("X".equals(detailItem.getProdQty())) {
+					mapper.deleteCartQty(detailItem);
+				}
+				else {
+					mapper.updateCartQty(detailItem);
 				}
 			}
-			else {
-				int availprodQty = mapper.selectCartQty(param);
-				if("UP".equals(param.getQtyChangeType()) && cartQty > availprodQty) { // 재고부족시
-					return -3;
-				}
-				result = mapper.updateCartQty(param);
-				if (result != 1) {
-					throw new RuntimeException("######### Expected updateCartQty count 1, but was " + result);
-				}
-			}
-			return result;
+			return 1;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

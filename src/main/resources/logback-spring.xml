@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+    <!-- 개발 환경에서 사용할 로깅 설정 -->
     <springProfile name="!prod">
+        <!-- 콘솔 출력을 위한 Appender 정의 -->
         <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
+                <!-- 로그 메시지 포맷 지정 -->
                 <pattern>%d{"yyyy-MM-dd HH:mm:ss"} [%thread] %-5level %logger{36} - %msg%n</pattern>
             </encoder>
         </appender>
     </springProfile>
 
+    <!-- 운영 환경에서 사용할 로깅 설정 -->
     <springProfile name="prod">
+        <!-- 파일 로깅을 위한 Appender 정의 -->
         <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <!-- 로그 파일의 저장 경로 -->
             <file>logs/app.log</file>
             <encoder>
+                <!-- 로그 메시지 포맷 지정 -->
                 <pattern>%d{"yyyy-MM-dd HH:mm:ss"} [%thread] %-5level %logger{36} - %msg%n</pattern>
             </encoder>
+            <!-- 로그 파일의 롤링 정책 설정 -->
             <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <!-- 롤링될 로그 파일명 패턴과 롤링 주기(여기서는 일별) -->
                 <fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <!-- 보관할 로그 파일의 최대 기록일 수 -->
                 <maxHistory>30</maxHistory>
+                <!-- 애플리케이션 시작 시 이전 로그 파일 정리 여부 -->
                 <cleanHistoryOnStart>true</cleanHistoryOnStart>
             </rollingPolicy>
         </appender>
     </springProfile>
 
+    <!-- 로그 레벨 설정 (INFO 레벨 이상의 로그 출력) -->
     <root level="info">
+        <!-- 개발 환경일 경우 CONSOLE Appender 사용 -->
         <springProfile name="!prod">
             <appender-ref ref="CONSOLE"/>
         </springProfile>
+        <!-- 운영 환경일 경우 FILE Appender 사용 -->
         <springProfile name="prod">
             <appender-ref ref="FILE"/>
         </springProfile>
