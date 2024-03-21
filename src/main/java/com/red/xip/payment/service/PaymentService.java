@@ -46,10 +46,13 @@ public class PaymentService {
 	public R_Tosspay insertOrder(P_Tosspay param) throws Exception {
 		try {
 			R_Tosspay result = new R_Tosspay();
+			// 화면에 보여줄 가격 리턴
+			result.setPrice(param.getAmount());
+			
 			// 이미 구매한 제품인지 확인 
 			String orderCd = mapper.orderStatusCheck(param);
-			if (orderCd == null) {
-			    // orderCd가 null일 경우의 처리 로직
+			
+			if (orderCd == null) {// orderCd가 null일 경우의 처리 로직 이미 있으면 그대로 리턴
 				// 실제 결제되야하는 가격 값 가져오기
 				String price = "";
 				if("cart".equals(param.getOrderMethod())) {
@@ -99,7 +102,6 @@ public class PaymentService {
 				
 				// 주문번호 형식 맞추기
 				orderCd = String.format("%08d", param.getOrderCd());
-				
 				
 				// 토스결제 확인 요청 후 
 				confirmAfter(param, price, orderCd);

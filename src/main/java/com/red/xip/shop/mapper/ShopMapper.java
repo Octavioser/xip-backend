@@ -63,4 +63,6 @@ public interface ShopMapper {
 
 	int deleteSoldoutCart() throws Exception;
 
+	List<R_OrderD> selectCountries() throws Exception;;
+
 }

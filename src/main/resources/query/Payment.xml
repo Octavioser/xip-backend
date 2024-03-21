@@ -11,7 +11,7 @@
 		<![CDATA[
 			SELECT  ORDER_CD
 			FROM    XIP_ORDER
-			WHERE    USER_CD = CAST(#{userCd}AS UNSIGNED)
+			WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED)
 			AND     PG_NAME = #{pgName}
 			AND     PAYMENT_KEY = #{paymentKey}
 			AND     ORDER_ID = #{orderId}
@@ -22,7 +22,9 @@
 		parameterType = "com.red.xip.payment.model.P_Tosspay"
 		resultType="String">
 		<![CDATA[
-			SELECT  SUM(C.PROD_QTY * P.PRICE)
+			SELECT  SUM(C.PROD_QTY * CASE AD.ISO2 WHEN 'KR' THEN P.PRICE
+                                                  ELSE P.US_PRICE END
+                    )+ MAX(CO.SHIP_FEE)
 			FROM    XIP_CART AS C 
 			        INNER JOIN XIP_PROD_D AS PD
                     ON  PD.PROD_CD_D = C.PROD_CD_D
@@ -30,7 +32,11 @@
                     INNER JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
                     AND P.STATUS != '-1'
-			WHERE   USER_CD =  CAST(#{userCd}AS UNSIGNED)
+                    INNER JOIN ADDRESSES AS AD
+                    ON  AD.USER_CD = C.USER_CD
+                    INNER JOIN COUNTRIES AS CO 
+                	ON AD.ISO2 = CO.ISO2
+			WHERE   C.USER_CD =  CAST(#{userCd}AS UNSIGNED)
 			AND     P.STATUS != '-1'
 			GROUP BY C.USER_CD
 		]]>
@@ -40,11 +46,17 @@
 		parameterType = "com.red.xip.payment.model.P_Tosspay"
 		resultType="String">
 		<![CDATA[
-			SELECT  PRICE
+			SELECT  CASE AD.ISO2 WHEN 'KR' THEN P.PRICE
+                                 ELSE P.US_PRICE END
+                                 + CO.SHIP_FEE
 			FROM    XIP_PROD_D AS PD 
 			        INNER JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
                     AND P.STATUS != '-1'
+                    INNER JOIN ADDRESSES AS AD
+                    ON  AD.USER_CD = CAST(#{userCd}AS UNSIGNED)
+                    INNER JOIN COUNTRIES AS CO 
+                	ON AD.ISO2 = CO.ISO2
 			WHERE   PD.PROD_CD_D = #{orderMethod}
 			AND     PD.SOLD_QTY < PD.TOTAL_QTY
 		]]>
@@ -79,32 +91,35 @@
 		    CREAT_DT,
 		    MODIFY_DT
 		)
-		SELECT   USER_CD,
+		SELECT  AD.USER_CD,
 		        #{pgName} AS PG_NAME,
 		        #{paymentKey} AS PAYMENT_KEY,
 		        #{orderId} AS OREDER_ID,
 		        '1' AS ORDER_STATUS,
 		        '' AS PAY_METHOD,
 		        NOW() AS ORDER_DT,
-		        'KRW' AS CURRENCY,
+		        CASE AD.ISO2 WHEN 'KR' THEN 'KRW'
+                             ELSE 'USD' END AS CURRENCY,
 		        #{amount} AS TOTAL_AMOUNT,
-		        0 AS SHIPPING_AMOUNT,
+		        CO.SHIP_FEE AS SHIPPING_AMOUNT,
 		        'KOREA POST' AS SHIPIING_METHOD,
 		        NULL AS TRACKING_NUM,
 		        NULL AS SHIP_DT,
-		        ADD_LAST_NM,
-		        ADD_FIRST_NM,
-		        PHONE,
-		        COMPANY,
-		        ADD_1,
-		        ADD_2,
-		        CITY,
-		        ADD_COUNTRY,
-		        STATE,
-		        POSTAL_CD,
+		        AD.ADD_LAST_NM,
+		        AD.ADD_FIRST_NM,
+		        AD.PHONE,
+		        AD.COMPANY,
+		        AD.ADD_1,
+		        AD.ADD_2,
+		        AD.CITY,
+		        AD.ADD_COUNTRY,
+		        AD.STATE,
+		        AD.POSTAL_CD,
 		        NOW() AS CREAT_DT,
 		        NOW() AS MODIFY_DT
-		FROM    ADDRESSES
+		FROM    ADDRESSES AS AD
+				INNER JOIN COUNTRIES AS CO 
+                ON AD.ISO2 = CO.ISO2
 		WHERE   USER_CD= CAST(#{userCd}AS UNSIGNED)
 	</insert>
 	<insert id="insertOrderD" parameterType="com.red.xip.payment.model.P_Tosspay">

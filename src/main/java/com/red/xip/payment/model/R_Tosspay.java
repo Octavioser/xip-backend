@@ -10,5 +10,5 @@ import lombok.ToString;
 public class R_Tosspay {
 
 	private String orderCd;
-	private int ok;
+	private String price;
 }

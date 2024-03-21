@@ -424,4 +424,30 @@ public class ShopController {
 			return APIResult.fail(e.getMessage());
 		}
 	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectCountries
+	@PostMapping("/shopR007")
+	@ResponseBody
+	public APIResult selectCountries(HttpServletRequest servletRequest, HttpServletResponse servletResponse
+		/* RequestContext session , */) throws Exception {
+    	try {
+    		// 쿠키 정보 갖고오기
+    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+            
+    		String userCd = userInfo.get("userCd");
+    		
+    		String email = userInfo.get("email");
+    		
+    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+    			return APIResult.tokenFail();
+    		}
+            
+            return APIResult.success(service.selectCountries());
+            
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
 }

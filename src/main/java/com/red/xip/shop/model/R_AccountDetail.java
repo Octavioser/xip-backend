@@ -25,6 +25,9 @@ public class R_AccountDetail {
 	private String iso2;
 	private String state;
 	private String postalCd;
+	private String userCd;
+	
+	private int shipFee;
 	
 	private String webAuthId;
 }

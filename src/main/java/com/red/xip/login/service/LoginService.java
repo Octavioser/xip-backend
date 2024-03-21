@@ -466,14 +466,16 @@ public class LoginService {
 			try {
 				authenticationData = webAuthnManager.parse(authenticationRequest);
 			} catch (Exception e) {
-				return Collections.emptyList();
+				LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+				throw e;
 			}	
 			// 인증
 			try {
 			    webAuthnManager.validate(authenticationData, authenticationParameters);
 			} catch (ValidationException e) {
 				// 인증 실패
-				return Collections.emptyList();
+				LOG.error("ValidationException [Err_Location] : {}", e.getStackTrace()[0]);
+				throw e;
 			}
 			
 			// 인증 성공시

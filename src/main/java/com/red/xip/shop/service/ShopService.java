@@ -209,4 +209,13 @@ public class ShopService {
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
 		}
 	}
+
+	public List<R_OrderD> selectCountries() throws Exception {
+		try {
+			return mapper.selectCountries();
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
 }
