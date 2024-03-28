@@ -1,24 +1,31 @@
 package com.red.xip.xipengineering.service;
 
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.red.xip.awsS3Upload.S3Service;
 import com.red.xip.awsSesEmail.service.AwsSesService;
+import com.red.xip.payment.model.TossPaymentsResponse;
 import com.red.xip.xipengineering.mapper.XipengineeringMapper;
 import com.red.xip.xipengineering.model.P_Canceled;
 import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
+import com.red.xip.xipengineering.model.P_ProdStatus;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
 import com.red.xip.xipengineering.model.P_Shipped;
 import com.red.xip.xipengineering.model.P_Tracking;
@@ -27,7 +34,9 @@ import com.red.xip.xipengineering.model.R_Canceled;
 import com.red.xip.xipengineering.model.R_Cancelling;
 import com.red.xip.xipengineering.model.R_DetailCancelling;
 import com.red.xip.xipengineering.model.R_Orders;
+import com.red.xip.xipengineering.model.R_PayCancel;
 import com.red.xip.xipengineering.model.R_ProdOrder;
+import com.red.xip.xipengineering.model.R_ProdStatus;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
 import com.red.xip.xipengineering.model.R_ShipDetails;
 import com.red.xip.xipengineering.model.R_ShipInfo;
@@ -46,6 +55,9 @@ public class XipengineeringService {
 	
 	@Autowired
 	S3Service s3Service;
+	
+	@Value("${toss.pay.secret-key}")
+	private String secretKey;
 	
 	@Autowired // 이메일템플릿
     private TemplateEngine templateEngine;
@@ -150,8 +162,35 @@ public class XipengineeringService {
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCanceled(P_Cancelling param) throws Exception{
 		try {
-			mapper.updateCancelStatus(param);
-			return mapper.insertCancel(param);
+			int result = mapper.updateCancelStatus(param);
+			// 멱등키 
+			String IdempotencyKey = UUID.randomUUID().toString();
+			param.setIdempotencyKey(IdempotencyKey);
+			result = mapper.insertCancel(param);
+			// 토스 취소시 정보 갖고오기
+			R_PayCancel payInfo=  mapper.selectCancelPayInfo(param);
+			
+			// 토스페이 취소 api 
+			String encodedString = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+			String url = "/v1/payments/" + payInfo.getPaymentKey() + "/cancel";
+			
+			WebClient webClient = WebClient.builder().baseUrl("https://api.tosspayments.com").build();
+			TossPaymentsResponse response = webClient.post()
+	            .uri(url)
+	            .header(HttpHeaders.AUTHORIZATION, encodedString)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .header("Idempotency-Key", payInfo.getIdempotencyKey())
+                .bodyValue(String.format("{\"cancelReason\":\"%s\",\"cancelAmount\":%s,\"currency\":\"%s\"}", payInfo.getCancelReason(), payInfo.getCancelAmount(), payInfo.getCurrency()))
+                .retrieve()
+                .bodyToMono(TossPaymentsResponse.class)
+                .block(); // 동기 처리
+			System.out.println(response.getStatus());
+//			if(!"CANCELED".equals(response.getStatus())) {
+//				throw new RuntimeException("Error: 사용자 결제실패");
+//			}
+			
+			return result;
+			
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
@@ -227,6 +266,46 @@ public class XipengineeringService {
 			param.setProdDSrc(prodDetailImgSrc);
 			return mapper.insertProdDImg(param);
 
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	public List<R_ProdStatus> selectSeason(P_ProdStatus param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectSeason(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	public List<R_ProdStatus> selectProdStatus(P_ProdStatus param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectProdStatus(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	public int updateProdDesc(P_ProdStatus param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.updateProdDesc(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	public int updateProd(P_ProdStatus param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.updateProd(param);
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

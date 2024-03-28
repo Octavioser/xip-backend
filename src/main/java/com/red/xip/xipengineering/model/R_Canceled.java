@@ -15,4 +15,7 @@ public class R_Canceled {
 	private String orderDt;
 	private String cancelDt;
 	private String cancelAmount;
+	private String totalAmount;
+	private String shippingAmount;
+	private String subTotal;
 }

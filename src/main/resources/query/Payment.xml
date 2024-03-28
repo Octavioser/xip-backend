@@ -31,13 +31,13 @@
                     AND PD.SOLD_QTY < PD.TOTAL_QTY
                     INNER JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
-                    AND P.STATUS != '-1'
                     INNER JOIN ADDRESSES AS AD
                     ON  AD.USER_CD = C.USER_CD
                     INNER JOIN COUNTRIES AS CO 
                 	ON AD.ISO2 = CO.ISO2
 			WHERE   C.USER_CD =  CAST(#{userCd}AS UNSIGNED)
 			AND     P.STATUS != '-1'
+			AND     P.STATUS != '2'
 			GROUP BY C.USER_CD
 		]]>
 	</select>
@@ -52,12 +52,13 @@
 			FROM    XIP_PROD_D AS PD 
 			        INNER JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
-                    AND P.STATUS != '-1'
                     INNER JOIN ADDRESSES AS AD
                     ON  AD.USER_CD = CAST(#{userCd}AS UNSIGNED)
                     INNER JOIN COUNTRIES AS CO 
                 	ON AD.ISO2 = CO.ISO2
 			WHERE   PD.PROD_CD_D = #{orderMethod}
+			AND     P.STATUS != '-1'
+			AND     P.STATUS != '2'
 			AND     PD.SOLD_QTY < PD.TOTAL_QTY
 		]]>
 	</select>
@@ -130,6 +131,7 @@
 	    INSERT INTO XIP_ORDER_D (
 	        ORDER_CD,
 			PROD_CD_D,
+			ORDER_PRICE,
 			PROD_QTY,
 			CREAT_DT,
 			MODIFY_DT
@@ -140,6 +142,8 @@
 			<![CDATA[
 				SELECT  #{orderCd} AS ORDER_CD,
 						PD.PROD_CD_D,
+						CASE WHEN M.CURRENCY = 'KRW' THEN P.PRICE
+						     WHEN M.CURRENCY = 'USD' THEN P.US_PRICE END  AS ORDER_PRICE,
 						C.PROD_QTY,
 						NOW() AS CREAT_DT,
 						NOW() AS MODIFY_DT
@@ -149,19 +153,35 @@
 	                    AND PD.SOLD_QTY < PD.TOTAL_QTY
 	                    INNER JOIN XIP_PROD AS P
 	                    ON  P.PROD_CD = PD.PROD_CD
-	                    AND P.STATUS != '-1'
-				WHERE   USER_CD = CAST(#{userCd}AS UNSIGNED);
+	                    INNER JOIN XIP_ORDER AS M
+	                    ON  M.ORDER_CD = #{orderCd}
+	                    AND C.USER_CD = M.USER_CD
+				WHERE   C.USER_CD = CAST(#{userCd}AS UNSIGNED)
+				AND     P.STATUS != '-1'
+				AND     P.STATUS != '2';
 			]]>
 			</when>
 			
 			<otherwise>
-			VALUES (
-				#{orderCd},
-				#{orderMethod},
-				1,
-				NOW(),
-				NOW()
-			);	
+			<![CDATA[
+				SELECT  #{orderCd} AS ORDER_CD,
+	                    PD.PROD_CD_D,
+	                    CASE WHEN M.CURRENCY = 'KRW' THEN P.PRICE
+	                         WHEN M.CURRENCY = 'USD' THEN P.US_PRICE END  AS ORDER_PRICE,
+	                    1,
+	                    NOW() AS CREAT_DT,
+	                    NOW() AS MODIFY_DT
+	            FROM    XIP_PROD_D AS PD
+	                    INNER JOIN XIP_PROD AS P
+	                    ON  P.PROD_CD = PD.PROD_CD
+	                    INNER JOIN XIP_ORDER AS M
+	                    ON  M.ORDER_CD = #{orderCd}
+		                AND M.USER_CD = CAST(#{userCd}AS UNSIGNED)
+	            WHERE   PD.PROD_CD_D = #{orderMethod}
+	            AND     PD.SOLD_QTY < PD.TOTAL_QTY
+	            AND     P.STATUS != '-1'
+	            AND     P.STATUS != '2';
+	        ]]>
 			</otherwise>
 			
 		</choose>
@@ -198,8 +218,8 @@
                 CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
 			    CONCAT('Amount: ', OD.PROD_QTY) AS PROD_QTY,
                 CASE O.CURRENCY
-                     WHEN 'KRW' THEN CONCAT( '₩', FORMAT(OD.PROD_QTY * P.PRICE,0) )
-                     WHEN 'USD' THEN CONCAT( '$', FORMAT(OD.PROD_QTY * P.US_PRICE,0) )    
+                     WHEN 'KRW' THEN CONCAT( '₩', FORMAT(OD.PROD_QTY * OD.ORDER_PRICE,0) )
+                     WHEN 'USD' THEN CONCAT( '$', FORMAT(OD.PROD_QTY * OD.ORDER_PRICE,0) )    
                      ELSE '' END AS PRICE
         FROM    XIP_ORDER_D AS OD
                 INNER JOIN XIP_ORDER AS O

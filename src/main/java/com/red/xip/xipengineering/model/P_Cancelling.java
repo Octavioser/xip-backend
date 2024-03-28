@@ -18,6 +18,8 @@ public class P_Cancelling {
 	private String orderStatus;
 	
 	private String orderCd;
-	private String cancelAmount;
+	private int cancelAmount;
 	private String reason;
+	
+	private String idempotencyKey;
 }

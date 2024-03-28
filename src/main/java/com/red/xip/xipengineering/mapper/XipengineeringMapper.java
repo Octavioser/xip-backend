@@ -10,6 +10,7 @@ import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
+import com.red.xip.xipengineering.model.P_ProdStatus;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
 import com.red.xip.xipengineering.model.P_Shipped;
 import com.red.xip.xipengineering.model.P_Tracking;
@@ -18,7 +19,9 @@ import com.red.xip.xipengineering.model.R_Canceled;
 import com.red.xip.xipengineering.model.R_Cancelling;
 import com.red.xip.xipengineering.model.R_DetailCancelling;
 import com.red.xip.xipengineering.model.R_Orders;
+import com.red.xip.xipengineering.model.R_PayCancel;
 import com.red.xip.xipengineering.model.R_ProdOrder;
+import com.red.xip.xipengineering.model.R_ProdStatus;
 import com.red.xip.xipengineering.model.R_PurchaseOrders;
 import com.red.xip.xipengineering.model.R_ShipDetails;
 import com.red.xip.xipengineering.model.R_ShipInfo;
@@ -71,4 +74,14 @@ public interface XipengineeringMapper {
 	int insertProd(P_NewProd param) throws Exception;
 
 	int insertProdDImg(P_NewProd param) throws Exception;
+
+	List<R_ProdStatus> selectSeason(P_ProdStatus param) throws Exception;
+
+	List<R_ProdStatus> selectProdStatus(P_ProdStatus param) throws Exception;
+
+	int updateProdDesc(P_ProdStatus param) throws Exception;
+
+	int updateProd(P_ProdStatus param) throws Exception;
+
+	R_PayCancel selectCancelPayInfo(P_Cancelling param) throws Exception;
 }

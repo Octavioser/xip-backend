@@ -21,6 +21,7 @@ import com.red.xip.xipengineering.model.P_Cancelling;
 import com.red.xip.xipengineering.model.P_NewProd;
 import com.red.xip.xipengineering.model.P_Orders;
 import com.red.xip.xipengineering.model.P_ProdOrder;
+import com.red.xip.xipengineering.model.P_ProdStatus;
 import com.red.xip.xipengineering.model.P_PurchaseOrders;
 import com.red.xip.xipengineering.model.P_Shipped;
 import com.red.xip.xipengineering.model.P_Tracking;
@@ -413,7 +414,7 @@ public class XipengineeringController {
 	}
 	
 	// C100생성 R000출력 U200갱신 D300삭제
-	// selectProdOrder  취소내역
+	// selectProdOrder  재고관리 데이터 가져오기
 	@PostMapping("/incuR010")
 	@ResponseBody
 	public APIResult selectProdOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
@@ -514,4 +515,139 @@ public class XipengineeringController {
 		}
 	}
 	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectSeason  시즌데이터 가져오기
+	@PostMapping("/incuR011")
+	@ResponseBody
+	public APIResult selectSeason(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdStatus param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return APIResult.tokenFail();
+			}
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.selectSeason(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectProdStatus  제품상태 가져오기
+	@PostMapping("/incuR012")
+	@ResponseBody
+	public APIResult selectProdStatus(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdStatus param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return APIResult.tokenFail();
+			}
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.selectProdStatus(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateProdDesc  상품 제품설명 업데이트
+	@PostMapping("/incuU204")
+	@ResponseBody
+	public APIResult updateProdDesc (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdStatus param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return APIResult.tokenFail();
+			}
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.updateProdDesc(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// updateProd  상품 제품 업데이트
+	@PostMapping("/incuU205")
+	@ResponseBody
+	public APIResult updateProd (HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdStatus param) throws Exception {
+		try {
+			// 쿠키 정보 갖고오기
+			HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
+	        
+			String userCd = userInfo.get("userCd");
+			
+			String email = userInfo.get("email");
+			
+			String roleType = userInfo.get("roleType");
+			
+			if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
+				return APIResult.tokenFail();
+			}
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.updateProd(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
 }

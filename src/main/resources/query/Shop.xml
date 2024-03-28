@@ -146,7 +146,8 @@
 			        M.PROD_DESC_D,
 			        D.PROD_CD_D,
 			        D.PROD_SIZE,
-			        CASE WHEN D.SOLD_QTY < D.TOTAL_QTY THEN 1 
+			        CASE WHEN (M.STATUS = '2' OR M.STATUS = '-1') THEN 2 
+			        	 WHEN D.SOLD_QTY < D.TOTAL_QTY THEN 1 
 			             ELSE 2 END AS PROD_STATUS,
 			        IMG.IMG_SRC
 			FROM    XIP_PROD AS M
@@ -190,7 +191,7 @@
                     ON  PD.PROD_CD_D = C.PROD_CD_D
                     LEFT JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
-            WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY OR P.STATUS = '-1'
+            WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY OR P.STATUS = '-1' OR P.STATUS = '2' 
 		]]>
 	</delete>
 	
@@ -212,9 +213,10 @@
 			        AND D.SOLD_QTY < D.TOTAL_QTY
 			        INNER JOIN XIP_PROD AS M
 			        ON  M.PROD_CD = D.PROD_CD
-			        AND M.STATUS != '-1'
 			WHERE   C.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			AND     C.PROD_QTY > 0
+			AND     M.STATUS != '-1'
+			AND     M.STATUS != '2'
 		]]>
 	</select>
 	
@@ -334,8 +336,8 @@
 		        PD.PROD_SIZE, 
 		        D.PROD_QTY,
 		        CASE CURRENCY
-		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(P.PRICE * D.PROD_QTY,0) )
-		             WHEN 'USD' THEN CONCAT( '$', FORMAT(P.US_PRICE * D.PROD_QTY,0) )    
+		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(D.ORDER_PRICE * D.PROD_QTY,0) )
+		             WHEN 'USD' THEN CONCAT( '$', FORMAT(D.ORDER_PRICE * D.PROD_QTY,0) )    
 		             ELSE '' END AS PROD_PRICE
 		FROM    XIP_ORDER_D AS D 
 		        INNER JOIN XIP_ORDER AS M
