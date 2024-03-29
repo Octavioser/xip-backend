@@ -28,17 +28,18 @@
 			FROM    XIP_CART AS C 
 			        INNER JOIN XIP_PROD_D AS PD
                     ON  PD.PROD_CD_D = C.PROD_CD_D
-                    AND PD.SOLD_QTY < PD.TOTAL_QTY
                     INNER JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
                     INNER JOIN ADDRESSES AS AD
                     ON  AD.USER_CD = C.USER_CD
                     INNER JOIN COUNTRIES AS CO 
-                	ON AD.ISO2 = CO.ISO2
+                	ON  AD.ISO2 = CO.ISO2
 			WHERE   C.USER_CD =  CAST(#{userCd}AS UNSIGNED)
 			AND     P.STATUS != '-1'
 			AND     P.STATUS != '2'
-			GROUP BY C.USER_CD
+			AND     CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%')
+			AND     PD.SOLD_QTY < PD.TOTAL_QTY
+			GROUP BY C.USER_CD;
 		]]>
 	</select>
 	
@@ -59,7 +60,8 @@
 			WHERE   PD.PROD_CD_D = #{orderMethod}
 			AND     P.STATUS != '-1'
 			AND     P.STATUS != '2'
-			AND     PD.SOLD_QTY < PD.TOTAL_QTY
+			AND     CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%')
+			AND     PD.SOLD_QTY < PD.TOTAL_QTY;
 		]]>
 	</select>
 	
@@ -150,7 +152,6 @@
 				FROM    XIP_CART AS C
 						INNER JOIN XIP_PROD_D AS PD
 	                    ON  PD.PROD_CD_D = C.PROD_CD_D
-	                    AND PD.SOLD_QTY < PD.TOTAL_QTY
 	                    INNER JOIN XIP_PROD AS P
 	                    ON  P.PROD_CD = PD.PROD_CD
 	                    INNER JOIN XIP_ORDER AS M
@@ -158,7 +159,9 @@
 	                    AND C.USER_CD = M.USER_CD
 				WHERE   C.USER_CD = CAST(#{userCd}AS UNSIGNED)
 				AND     P.STATUS != '-1'
-				AND     P.STATUS != '2';
+				AND     P.STATUS != '2'
+				AND     CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%')
+				AND     PD.SOLD_QTY < PD.TOTAL_QTY;
 			]]>
 			</when>
 			
@@ -178,9 +181,10 @@
 	                    ON  M.ORDER_CD = #{orderCd}
 		                AND M.USER_CD = CAST(#{userCd}AS UNSIGNED)
 	            WHERE   PD.PROD_CD_D = #{orderMethod}
-	            AND     PD.SOLD_QTY < PD.TOTAL_QTY
 	            AND     P.STATUS != '-1'
-	            AND     P.STATUS != '2';
+	            AND     P.STATUS != '2'
+	            AND     CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%')
+	            AND     PD.SOLD_QTY < PD.TOTAL_QTY;
 	        ]]>
 			</otherwise>
 			
@@ -207,7 +211,6 @@
                 ON OD.PROD_CD_D = PD.PROD_CD_D
            SET  PD.SOLD_QTY = PD.SOLD_QTY + OD.PROD_QTY
         WHERE   OD.ORDER_CD = #{orderCd}
-        AND     PD.SOLD_QTY < PD.TOTAL_QTY
     ]]>
 	</update>
 	
@@ -224,9 +227,9 @@
         FROM    XIP_ORDER_D AS OD
                 INNER JOIN XIP_ORDER AS O
                 ON  O.ORDER_CD = OD.ORDER_CD
-                LEFT OUTER JOIN XIP_PROD_D AS PD
+                INNER JOIN XIP_PROD_D AS PD
                 ON  PD.PROD_CD_D = OD.PROD_CD_D
-                LEFT OUTER JOIN XIP_PROD AS P
+                INNER JOIN XIP_PROD AS P
                 ON  P.PROD_CD = PD.PROD_CD
 		WHERE   OD.ORDER_CD = #{orderCd}
 	</select>

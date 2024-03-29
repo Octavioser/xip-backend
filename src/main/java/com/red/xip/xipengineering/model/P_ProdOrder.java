@@ -21,4 +21,5 @@ public class P_ProdOrder {
 	private BigDecimal soldQty;
 	private BigDecimal totalQty;
 	private String prodCd;
+	private String sizeStatus;
 }

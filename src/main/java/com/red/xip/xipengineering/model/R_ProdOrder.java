@@ -22,4 +22,5 @@ public class R_ProdOrder {
 	private BigDecimal usdSubTotal;
 	private BigDecimal soldTotal;
 	private String saveBtn;
+	private String sizeStatus;
 }

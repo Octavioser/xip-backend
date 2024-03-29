@@ -23,7 +23,6 @@ public class P_NewProd {
     private BigDecimal price;
     private BigDecimal usPrice;
     private String sizeOpt;
-    private String status;
     private String line;
     private String season;
     private String prodDesc;

@@ -118,9 +118,9 @@
 			        INNER JOIN XIP_INCU AS X 
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			        LEFT OUTER JOIN XIP_PROD_D AS PD
+			        INNER JOIN XIP_PROD_D AS PD
 			        ON  PD.PROD_CD_D = D.PROD_CD_D
-			        LEFT OUTER JOIN XIP_PROD AS P
+			        INNER JOIN XIP_PROD AS P
 			        ON  P.PROD_CD = PD.PROD_CD
 			WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
@@ -197,9 +197,9 @@
 			        INNER JOIN XIP_INCU AS X 
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			        LEFT OUTER JOIN XIP_PROD_D AS PD 
+			        INNER JOIN XIP_PROD_D AS PD 
 			        ON  PD.PROD_CD_D = M.PROD_CD_D
-			        LEFT OUTER JOIN XIP_PROD AS P
+			        INNER JOIN XIP_PROD AS P
 			        ON  P.PROD_CD = PD.PROD_CD
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
@@ -388,6 +388,8 @@
 			SELECT  PD.PROD_CD_D,
 			        P.NAME,
 			        PD.PROD_SIZE,
+			        CASE WHEN CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%') THEN '사용중'
+			        	 ELSE '사용안함' END SIZE_STATUS,
 			        PD.SOLD_QTY,
 			        PD.TOTAL_QTY,
 			        PD.TOTAL_QTY - PD.SOLD_QTY AS STOCK_QTY,
@@ -401,7 +403,7 @@
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			        LEFT OUTER JOIN XIP_PROD AS P
+			        INNER JOIN XIP_PROD AS P
 			        ON  P.PROD_CD = PD.PROD_CD
 			        LEFT OUTER JOIN (
 			            SELECT  M.ORDER_CD,
@@ -417,6 +419,9 @@
 						AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
 			        ) AS O
 			        ON  O.PROD_CD_D = PD.PROD_CD_D
+			WHERE   CASE WHEN IFNULL(#{sizeStatus},'') = '' THEN TRUE
+			             ELSE CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%') END
+			AND     CASE WHEN IFNULL(#{season},'') = '' THEN TRUE ELSE P.SEASON = #{season} END
 			GROUP BY PD.PROD_CD_D, P.NAME, PD.PROD_SIZE, SOLD_QTY, TOTAL_QTY, STOCK_QTY
 		]]>
 	</select>
@@ -457,7 +462,7 @@
 			    #{price},
 			    #{usPrice},
 			    #{sizeOpt},
-			    #{status},
+			    '-1',
 			    #{line},
 			    #{season},
 			    #{prodDesc},
@@ -484,7 +489,7 @@
 			VALUES
 		]]>
 		<foreach collection="list" item="item" separator=",">
-            (#{item.prodCdD}, #{item.prodCd}, #{item.prodSize}, 0, #{item.totalQty}, NOW(), NOW())
+            (#{item.prodCdD}, #{item.prodCd}, #{item.prodSize}, 0, 0, NOW(), NOW())
         </foreach>
 	</insert>
 	

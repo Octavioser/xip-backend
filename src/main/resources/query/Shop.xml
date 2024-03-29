@@ -156,7 +156,8 @@
 			        LEFT OUTER JOIN XIP_IMAGE AS IMG
 			        ON  IMG.IMAGE_CD = M.PROD_CD
 			WHERE   M.PROD_CD = #{prodCd}
-			AND     STATUS != '-1'
+			AND     M.STATUS != '-1'
+			AND     CONCAT('|',M.SIZE_OPT,'|') LIKE CONCAT('%|',D.PROD_SIZE,'|%') 
 		]]>
 	</select>
 	
@@ -191,7 +192,10 @@
                     ON  PD.PROD_CD_D = C.PROD_CD_D
                     LEFT JOIN XIP_PROD AS P
                     ON  P.PROD_CD = PD.PROD_CD
-            WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY OR P.STATUS = '-1' OR P.STATUS = '2' 
+            WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY 
+            OR      P.STATUS = '-1' 
+            OR      P.STATUS = '2'
+            OR      CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%') 
 		]]>
 	</delete>
 	
@@ -210,13 +214,14 @@
 			FROM    XIP_CART AS C
 			        INNER JOIN XIP_PROD_D AS D
 			        ON  D.PROD_CD_D = C.PROD_CD_D
-			        AND D.SOLD_QTY < D.TOTAL_QTY
 			        INNER JOIN XIP_PROD AS M
 			        ON  M.PROD_CD = D.PROD_CD
 			WHERE   C.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			AND     C.PROD_QTY > 0
 			AND     M.STATUS != '-1'
 			AND     M.STATUS != '2'
+			AND     CONCAT('|',M.SIZE_OPT,'|') NOT LIKE CONCAT('%|',D.PROD_SIZE,'|%') 
+			AND     D.SOLD_QTY < D.TOTAL_QTY
 		]]>
 	</select>
 	
@@ -342,9 +347,9 @@
 		FROM    XIP_ORDER_D AS D 
 		        INNER JOIN XIP_ORDER AS M
 		        ON  M.ORDER_CD = D.ORDER_CD
-		        LEFT OUTER JOIN XIP_PROD_D AS PD
+		        INNER JOIN  XIP_PROD_D AS PD
 		        ON  PD.PROD_CD_D = D.PROD_CD_D
-		        LEFT OUTER JOIN XIP_PROD AS P
+		        INNER JOIN  XIP_PROD AS P
 		        ON  P.PROD_CD = PD.PROD_CD
 		WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     M.USER_CD = CAST(#{userCd}AS UNSIGNED)
