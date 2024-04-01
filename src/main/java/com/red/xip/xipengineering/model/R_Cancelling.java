@@ -17,6 +17,5 @@ public class R_Cancelling {
 	private String totalAmount;
 	private String shippingAmount;
 	private String subTotal;
-	private String cancelBtn;
 	private String orderStatus;
 }

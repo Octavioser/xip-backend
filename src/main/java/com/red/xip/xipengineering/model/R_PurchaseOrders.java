@@ -13,5 +13,4 @@ public class R_PurchaseOrders {
 	private String userNm;
 	private String email;
 	private String orderDt;
-	private String trackingInput;
 }

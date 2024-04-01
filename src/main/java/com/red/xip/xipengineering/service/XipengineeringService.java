@@ -43,6 +43,7 @@ import com.red.xip.xipengineering.model.R_ShipInfo;
 import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
+import com.red.xip.xipengineering.model.TrackingProd;
 
 @Service
 public class XipengineeringService {
@@ -175,7 +176,8 @@ public class XipengineeringService {
 			String url = "/v1/payments/" + payInfo.getPaymentKey() + "/cancel";
 			
 			WebClient webClient = WebClient.builder().baseUrl("https://api.tosspayments.com").build();
-			TossPaymentsResponse response = webClient.post()
+//			TossPaymentsResponse response = 
+			webClient.post()
 	            .uri(url)
 	            .header(HttpHeaders.AUTHORIZATION, encodedString)
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
@@ -303,6 +305,16 @@ public class XipengineeringService {
 		// TODO Auto-generated method stub
 		try {
 			return mapper.updateProd(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	public List<TrackingProd> selectOrdersProdDetails(P_Tracking param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			return mapper.selectTrackingProd(param);
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

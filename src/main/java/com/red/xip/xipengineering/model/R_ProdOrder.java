@@ -18,9 +18,9 @@ public class R_ProdOrder {
 	private BigDecimal totalQty;
 	private BigDecimal stockQty;
 	private BigDecimal prodQty;
+	private BigDecimal cancelQty;
 	private BigDecimal krwSubTotal;
 	private BigDecimal usdSubTotal;
 	private BigDecimal soldTotal;
-	private String saveBtn;
 	private String sizeStatus;
 }

@@ -67,8 +67,7 @@
 			SELECT  M.ORDER_CD,
 			        CONCAT(U.FIRST_NM, ' ', U.LAST_NM) AS USER_NM,
 			        U.EMAIL,
-			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
-			        '운송장 등록' AS TRACKING_INPUT
+			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT
 			FROM    XIP_ORDER AS M
 			        INNER JOIN XIP_INCU AS X 
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -112,8 +111,8 @@
 		<![CDATA[
 			SELECT  D.PROD_CD_D,
 			        P.NAME,
-			        CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
-			        CONCAT('Amount: ',D.PROD_QTY) AS PROD_QTY
+			        CONCAT('Size : ',PD.PROD_SIZE) AS PROD_SIZE,
+			        CONCAT('Amount : ',D.PROD_QTY) AS PROD_QTY
 			FROM    XIP_ORDER_D AS D
 			        INNER JOIN XIP_INCU AS X 
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -254,8 +253,7 @@
 			        CASE M.CURRENCY
 			             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )    
-			             ELSE '' END AS SUB_TOTAL,
-			        '취소버튼' AS CANCEL_BTN
+			             ELSE '' END AS SUB_TOTAL
 			FROM    XIP_ORDER AS M
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -394,11 +392,11 @@
 			        PD.TOTAL_QTY,
 			        PD.TOTAL_QTY - PD.SOLD_QTY AS STOCK_QTY,
 			        SUM(IFNULL(O.PROD_QTY,0)) AS PROD_QTY,
+        			SUM(IFNULL(O.CANCEL_QTY,0)) AS CANCEL_QTY,
 			        SUM(CASE WHEN O.CURRENCY = 'KRW' THEN IFNULL(O.ORDER_PRICE,0)  * IFNULL(O.PROD_QTY,0)
 			             ELSE 0 END)  AS KRW_SUB_TOTAL,
 			        SUM(CASE WHEN O.CURRENCY = 'USD' THEN IFNULL(O.ORDER_PRICE,0)  * IFNULL(O.PROD_QTY,0) 
-			             ELSE 0 END)  AS USD_SUB_TOTAL,
-			        '저장' AS SAVE_BTN
+			             ELSE 0 END)  AS USD_SUB_TOTAL
 			FROM    XIP_PROD_D AS PD 
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
@@ -407,15 +405,15 @@
 			        ON  P.PROD_CD = PD.PROD_CD
 			        LEFT OUTER JOIN (
 			            SELECT  M.ORDER_CD,
-			                    D.PROD_QTY,
+			                    CASE WHEN M.ORDER_STATUS != '-1' THEN D.PROD_QTY ELSE 0 END AS PROD_QTY,
+                    			CASE WHEN M.ORDER_STATUS = '-1' THEN D.PROD_QTY ELSE 0 END AS CANCEL_QTY,
 			                    M.CURRENCY,
 			                    D.PROD_CD_D,
 			                    D.ORDER_PRICE
 			            FROM    XIP_ORDER AS M
 			                    INNER JOIN XIP_ORDER_D AS D
 			                    ON  D.ORDER_CD = M.ORDER_CD
-			            WHERE   M.ORDER_STATUS != '-1'
-			            AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
+			            WHERE   DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
 						AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
 			        ) AS O
 			        ON  O.PROD_CD_D = PD.PROD_CD_D
@@ -532,10 +530,7 @@
 					P.SIZE_OPT,
 					P.STATUS,
 					P.PROD_DESC, 
-					P.PROD_DESC_D,
-					'제품설명 수정' AS PROD_DESC_BTN,
-					'저장' AS SAVE_BTN,
-					'삭제' AS DELETE_BTN
+					P.PROD_DESC_D
             FROM    XIP_PROD AS P
             		INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)

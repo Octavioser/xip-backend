@@ -18,7 +18,4 @@ public class R_ProdStatus {
 	private String season;
 	private String prodDesc;
 	private String prodDescD;
-	private String prodDescBtn;
-	private String saveBtn;
-	private String deleteBtn;
 }
