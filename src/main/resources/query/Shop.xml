@@ -195,7 +195,7 @@
             WHERE   PD.SOLD_QTY >= PD.TOTAL_QTY 
             OR      P.STATUS = '-1' 
             OR      P.STATUS = '2'
-            OR      CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%') 
+            OR      CONCAT('|',P.SIZE_OPT,'|') NOT LIKE CONCAT('%|',PD.PROD_SIZE,'|%') 
 		]]>
 	</delete>
 	
@@ -220,7 +220,7 @@
 			AND     C.PROD_QTY > 0
 			AND     M.STATUS != '-1'
 			AND     M.STATUS != '2'
-			AND     CONCAT('|',M.SIZE_OPT,'|') NOT LIKE CONCAT('%|',D.PROD_SIZE,'|%') 
+			AND     CONCAT('|',M.SIZE_OPT,'|') LIKE CONCAT('%|',D.PROD_SIZE,'|%') 
 			AND     D.SOLD_QTY < D.TOTAL_QTY
 		]]>
 	</select>

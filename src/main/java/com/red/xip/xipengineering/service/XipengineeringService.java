@@ -184,10 +184,7 @@ public class XipengineeringService {
                 .retrieve()
                 .bodyToMono(TossPaymentsResponse.class)
                 .block(); // 동기 처리
-			System.out.println(response.getStatus());
-//			if(!"CANCELED".equals(response.getStatus())) {
-//				throw new RuntimeException("Error: 사용자 결제실패");
-//			}
+			// 결제가 실패할 경우 에러남
 			
 			return result;
 			
