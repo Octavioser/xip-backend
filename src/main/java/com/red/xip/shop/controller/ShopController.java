@@ -127,6 +127,11 @@ public class ShopController {
 	public APIResult selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
 		try {
+			String realIp = servletRequest.getHeader("X-Forwarded-For");
+    		if (realIp == null) {
+    		    realIp = servletRequest.getRemoteAddr();
+    		}
+    		LOG.info("클라이언트 IP: {}", realIp);
 			LOG.info("selectProdList 제품들 조회" + param.getSeason());
 	    	return APIResult.success(service.selectProdList(param));
 		} catch (Exception e) {
@@ -142,7 +147,7 @@ public class ShopController {
 	public APIResult selectDetailProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
 		try {
-			LOG.info("selectDetailProdList 상세 제품 조회");
+			LOG.info("selectDetailProdList 상세 제품 조회 " + param.getProdCdD());
 			return APIResult.success(service.selectDetailProdList(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());

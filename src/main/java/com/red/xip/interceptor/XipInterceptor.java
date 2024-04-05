@@ -27,15 +27,6 @@ public class XipInterceptor implements HandlerInterceptor {
         // 컨트롤러 메서드 실행 전
     	try {
     		
-    		
-    		String realIp = servletRequest.getHeader("X-Forwarded-For");
-    		if (realIp == null) {
-    		    realIp = servletRequest.getRemoteAddr();
-    		}
-    		LOG.info("클라이언트 IP: {}", realIp);
-    		
-    		
-    		
     		String authorizationHeader = servletRequest.getHeader("Authorization");
         	String token = authorizationHeader.substring(7); // "Bearer "를 제외한 토큰 부분을 추출합니다.
     		if ( "undefined".equals(token) || token == null || token.trim().isEmpty()) {

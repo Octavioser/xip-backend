@@ -32,6 +32,11 @@ public class MainController {
 	public APIResult selectImages(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Imges param) throws Exception {
     	try {            
+    		String realIp = servletRequest.getHeader("X-Forwarded-For");
+    		if (realIp == null) {
+    		    realIp = servletRequest.getRemoteAddr();
+    		}
+    		LOG.info("클라이언트 IP: {}", realIp);
     		LOG.info("selectImages 이미지 가져오기 " + param.getImageCd());
     		return APIResult.success(service.selectImages(param));
 		} catch (Exception e) {
