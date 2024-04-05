@@ -1,7 +1,5 @@
 package com.red.xip.payment.controller;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,12 +33,11 @@ public class PaymentController {
 	public APIResult insertOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Tosspay param) throws Exception {
     	try {
+    		LOG.info("insertOrder 결제하기");
     		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
-    		String email = userInfo.get("email");
+    		String email = (String) servletRequest.getAttribute("email");
     		
     		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
     			return APIResult.tokenFail();

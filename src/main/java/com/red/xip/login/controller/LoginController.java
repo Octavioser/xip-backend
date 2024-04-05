@@ -31,6 +31,7 @@ public class LoginController {
 	public APIResult getLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("getLoginCheck 로그인 체크");
     		return APIResult.success(service.getLoginCheck(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -44,6 +45,7 @@ public class LoginController {
 	public APIResult selectEmailCheckAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("selectEmailCheckAuthCode 로그인 인증코드 발송");
     		return APIResult.success(service.selectEmailCheckAuthCode(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -57,6 +59,7 @@ public class LoginController {
 	public APIResult selectEmailAuthCodeCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("selectEmailAuthCodeCheck 로그인 인증코드 확인");
     		return APIResult.success(service.selectEmailAuthCodeCheck(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -70,6 +73,7 @@ public class LoginController {
 	public APIResult insertCreateAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("insertCreateAccount 회원가입");
     		return APIResult.success(service.insertCreateAccount(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -83,6 +87,7 @@ public class LoginController {
 	public APIResult selectWebAuthCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
+    		LOG.info("selectWebAuthCheck 생체인증 이메일 확인");
     		return APIResult.success(service.selectWebAuthCheck(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -90,12 +95,13 @@ public class LoginController {
 		}
 	}
 	
-	// selectWebAuthCheck  가입이 되어있는지 아니면 등록이 되어있는지
+	// selectWebAuthCreateItem
 	@PostMapping("/loginR005")
 	@ResponseBody
 	public APIResult selectWebAuthCreateItem(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
+    		LOG.info("selectWebAuthCreateItem 생체인증 등록에 필요한 데이터 가져오기");
     		return APIResult.success(service.selectWebAuthCreateItem(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -109,6 +115,7 @@ public class LoginController {
 	public APIResult updateSaveWebAuth(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
+    		LOG.info("updateSaveWebAuth 생체인증 등록");
     		return APIResult.success(service.updateSaveWebAuth(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -122,6 +129,7 @@ public class LoginController {
 	public APIResult selectWebAuthLoginCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
+    		LOG.info("selectWebAuthLoginCheck 생체인증 검증");
     		return APIResult.success(service.selectWebAuthLoginCheck(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -135,6 +143,7 @@ public class LoginController {
 	public APIResult selectEmailCheck(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_WebAuth param) throws Exception {
     	try {
+    		LOG.info("selectEmailCheck 처음 이메일 체크");
     		return APIResult.success(service.selectEmailCheck(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -142,11 +151,13 @@ public class LoginController {
 		}
 	}
 	
+	// selectForgotPwAuthCode
 	@PostMapping("/loginR008")
 	@ResponseBody
 	public APIResult selectForgotPwAuthCode(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 			/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("selectForgotPwAuthCode 비번 찾기 인증번호 발송");
     		return APIResult.success(service.selectForgotPwAuthCode(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -160,6 +171,7 @@ public class LoginController {
 	public APIResult updatePw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Login param) throws Exception {
     	try {
+    		LOG.info("updatePw 비번 업데이트");
     		return APIResult.success(service.updatePw(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());

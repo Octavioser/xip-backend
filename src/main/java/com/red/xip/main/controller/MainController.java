@@ -32,6 +32,7 @@ public class MainController {
 	public APIResult selectImages(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Imges param) throws Exception {
     	try {            
+    		LOG.info("selectImages 이미지 가져오기 " + param.getImageCd());
     		return APIResult.success(service.selectImages(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());

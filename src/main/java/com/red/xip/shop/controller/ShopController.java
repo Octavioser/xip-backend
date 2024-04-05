@@ -1,7 +1,5 @@
 package com.red.xip.shop.controller;
 
-import java.util.HashMap;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.red.xip.common.CommonUtils;
 import com.red.xip.shop.model.P_Account;
 import com.red.xip.shop.model.P_Cart;
 import com.red.xip.shop.model.P_Order;
@@ -39,16 +36,11 @@ public class ShopController {
 	public APIResult selectDetailAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
+    		LOG.info("selectDetailAccount 유저 정보 주소포함 ");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		String email = (String) servletRequest.getAttribute("email");
     		
             param.setUserCd(userCd);
             param.setEmail(email);
@@ -67,16 +59,11 @@ public class ShopController {
 	public APIResult updateAccountInfoNm(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
+    		LOG.info("updateAccountInfoNm  유저이름 업데이트");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		String email = (String) servletRequest.getAttribute("email");
     		
             param.setUserCd(userCd);
             param.setEmail(email);
@@ -95,16 +82,12 @@ public class ShopController {
 	public APIResult updateAccountInfoPw(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
+    		LOG.info("updateAccountInfoPw 유저 비번 업데이트");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
-    		String email = userInfo.get("email");
+    		String email = (String) servletRequest.getAttribute("email");
     		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
     		
             param.setUserCd(userCd);
             
@@ -124,17 +107,10 @@ public class ShopController {
 	public APIResult insertAdd(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
-    		
+    		LOG.info("insertAdd 유저 주소 등록 및 업데이트");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
+
             param.setUserCd(userCd);
 
     		return APIResult.success(service.insertAdd(param));
@@ -151,7 +127,7 @@ public class ShopController {
 	public APIResult selectProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
 		try {
-			CommonUtils.ipLog(servletRequest);
+			LOG.info("selectProdList 제품들 조회" + param.getSeason());
 	    	return APIResult.success(service.selectProdList(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -166,6 +142,7 @@ public class ShopController {
 	public APIResult selectDetailProdList(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
 		try {
+			LOG.info("selectDetailProdList 상세 제품 조회");
 			return APIResult.success(service.selectDetailProdList(param));
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
@@ -181,17 +158,10 @@ public class ShopController {
 	public APIResult insertCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Shop param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
-    		
+    		LOG.info("insertCart 제품 상세페이지에서 장바구니 담기");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
+
             param.setUserCd(userCd);
 
     		return APIResult.success(service.insertCart(param));
@@ -208,16 +178,9 @@ public class ShopController {
 	public APIResult selectCart(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cart param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("selectCart 장바구니 조회");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -236,16 +199,9 @@ public class ShopController {
 	public APIResult updateCartQty(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Cart param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("updateCartQty 장바구니 수량 변경");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -264,16 +220,9 @@ public class ShopController {
 	public APIResult deleteWebauthn(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("deleteWebauthn 생체인증 정보 삭제");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -292,16 +241,9 @@ public class ShopController {
 	public APIResult deleteAccount(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Account param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("deleteAccount 회원 삭제");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -320,16 +262,9 @@ public class ShopController {
 	public APIResult selectOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_Order param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("selectOrder 주문 조회");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -348,17 +283,10 @@ public class ShopController {
 	public APIResult selectOrderDetails(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
-    		
+    		LOG.info("selectOrderDetails 상세 주문 조회");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
+
             param.setUserCd(userCd);
             
             return APIResult.success(service.selectOrderDetails(param));
@@ -376,16 +304,9 @@ public class ShopController {
 	public APIResult updateCancelOrder(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("updateCancelOrder 주문취소신청");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -404,16 +325,9 @@ public class ShopController {
 	public APIResult updateCancellingCancel(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
 		/* RequestContext session , */ @RequestBody P_OrderD param) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("updateCancellingCancel 주문취소를 취소");
+
+    		String userCd = (String) servletRequest.getAttribute("userCd");
     		
             param.setUserCd(userCd);
             
@@ -432,16 +346,7 @@ public class ShopController {
 	public APIResult selectCountries(HttpServletRequest servletRequest, HttpServletResponse servletResponse
 		/* RequestContext session , */) throws Exception {
     	try {
-    		// 쿠키 정보 갖고오기
-    		HashMap<String, String> userInfo = CommonUtils.getUserInfoFromCookie(servletRequest);
-            
-    		String userCd = userInfo.get("userCd");
-    		
-    		String email = userInfo.get("email");
-    		
-    		if("".equals(CommonUtils.stringIfNull(userCd)) || "".equals(CommonUtils.stringIfNull(email))) {
-    			return APIResult.tokenFail();
-    		}
+    		LOG.info("selectCountries 국가조회");
             
             return APIResult.success(service.selectCountries());
             
