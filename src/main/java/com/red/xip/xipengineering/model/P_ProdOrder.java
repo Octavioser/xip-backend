@@ -17,6 +17,7 @@ public class P_ProdOrder {
 	private String fromDt;
 	private String toDt;
 	private String season;
+	private String searchProdCd;
 	
 	private BigDecimal soldQty;
 	private BigDecimal totalQty;

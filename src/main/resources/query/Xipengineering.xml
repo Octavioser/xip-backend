@@ -420,6 +420,9 @@
 			WHERE   CASE WHEN IFNULL(#{sizeStatus},'') = '' THEN TRUE
 			             ELSE CONCAT('|',P.SIZE_OPT,'|') LIKE CONCAT('%|',PD.PROD_SIZE,'|%') END
 			AND     CASE WHEN IFNULL(#{season},'') = '' THEN TRUE ELSE P.SEASON = #{season} END
+			AND     CASE WHEN IFNULL(#{searchProdCd},'') = '' THEN TRUE 
+						 ELSE PD.PROD_CD_D LIKE CONCAT('%',#{searchProdCd},'%') OR 
+						      P.PROD_CD LIKE CONCAT('%',#{searchProdCd},'%') END
 			GROUP BY PD.PROD_CD_D, P.NAME, PD.PROD_SIZE, SOLD_QTY, TOTAL_QTY, STOCK_QTY
 		]]>
 	</select>
@@ -469,6 +472,17 @@
 			    NOW(),
 			    NOW()
 			)
+			ON DUPLICATE KEY UPDATE 
+			NAME = #{name},
+		    PRICE = #{price},
+		    US_PRICE = #{usPrice},
+		    SIZE_OPT = #{sizeOpt},
+		    STATUS = '-1',
+		    LINE = #{line},
+		    SEASON = #{season},
+		    PROD_DESC = #{prodDesc},
+		    PROD_DESC_D = #{prodDescD},
+		    IMAGE_SRC = #{imageSrc}
 		]]>
 	</insert>
 	
@@ -489,6 +503,11 @@
 		<foreach collection="list" item="item" separator=",">
             (#{item.prodCdD}, #{item.prodCd}, #{item.prodSize}, 0, 0, NOW(), NOW())
         </foreach>
+        ON DUPLICATE KEY UPDATE 
+		PROD_CD = VALUES(PROD_CD),
+        PROD_SIZE = VALUES(PROD_SIZE),
+        SOLD_QTY = VALUES(SOLD_QTY),
+        TOTAL_QTY = VALUES(TOTAL_QTY)
 	</insert>
 	
 	<insert id="insertProdDImg" 
@@ -502,6 +521,8 @@
 			    #{prodCd},
 			    #{prodDSrc}
 			)
+			ON DUPLICATE KEY UPDATE 
+	        IMG_SRC = #{prodDSrc}
 		]]>
 		
 	</insert>
