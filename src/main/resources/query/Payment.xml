@@ -199,7 +199,8 @@
 	
 	<update id="updatePayMethod" parameterType="com.red.xip.payment.model.P_Tosspay">
 		UPDATE  XIP_ORDER
-		   SET  PAY_METHOD = IFNULL(#{payMethod}, '')
+		   SET  PAY_METHOD = IFNULL(#{payMethod}, ''),
+		        MODIFY_DT = NOW()
 		 WHERE  ORDER_CD = #{orderCd}
 		 AND    USER_CD = CAST(#{userCd}AS UNSIGNED);
 	</update>

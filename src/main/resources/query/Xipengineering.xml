@@ -134,7 +134,8 @@
 			        AND X.EMAIL = #{email}
 			   SET  M.TRACKING_NUM = #{trackingNum},
 			        M.ORDER_STATUS='2',
-			        M.SHIP_DT = NOW()
+			        M.SHIP_DT = NOW(),
+			        M.MODIFY_DT = NOW()
 			WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</update>
@@ -302,7 +303,8 @@
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			   SET  ORDER_STATUS = '-1'
+			   SET  M.ORDER_STATUS = '-1',
+			        M.MODIFY_DT = NOW()
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</update>
@@ -429,13 +431,14 @@
 	<update id="updateProdOrder" 
 		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
 		<![CDATA[
-			UPDATE  XIP_PROD_D
+			UPDATE  XIP_PROD_D AS PD
 					INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
-			   SET  SOLD_QTY = #{soldQty},
-			        TOTAL_QTY = #{totalQty}     
-			WHERE   PROD_CD_D = #{prodCd} 
+			   SET  PD.SOLD_QTY = #{soldQty},
+			        PD.TOTAL_QTY = #{totalQty},
+			        PD.MODIFY_DT = NOW()     
+			WHERE   PD.PROD_CD_D = #{prodCd} 
 		]]>
 	</update>
 	
@@ -482,7 +485,8 @@
 		    SEASON = #{season},
 		    PROD_DESC = #{prodDesc},
 		    PROD_DESC_D = #{prodDescD},
-		    IMAGE_SRC = #{imageSrc}
+		    IMAGE_SRC = #{imageSrc},
+		    MODIFY_DT = NOW()
 		]]>
 	</insert>
 	
@@ -507,7 +511,8 @@
 		PROD_CD = VALUES(PROD_CD),
         PROD_SIZE = VALUES(PROD_SIZE),
         SOLD_QTY = VALUES(SOLD_QTY),
-        TOTAL_QTY = VALUES(TOTAL_QTY)
+        TOTAL_QTY = VALUES(TOTAL_QTY),
+        MODIFY_DT = NOW()
 	</insert>
 	
 	<insert id="insertProdDImg" 
@@ -572,7 +577,8 @@
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
 			        AND X.EMAIL = #{email}
 			   SET  P.PROD_DESC = #{prodDesc},
-			        P.PROD_DESC_D = #{prodDescD}     
+			        P.PROD_DESC_D = #{prodDescD},
+			        P.MODIFY_DT = NOW()     
 			WHERE   P.PROD_CD = #{prodCd} 
 		]]>
 	</update>
@@ -588,7 +594,8 @@
 			        P.PRICE = #{price},
 			        P.US_PRICE = #{usPrice},
 			        P.SIZE_OPT = #{sizeOpt},
-			        P.STATUS = #{status}     
+			        P.STATUS = #{status},
+			        P.MODIFY_DT = NOW()     
 			WHERE   P.PROD_CD = #{prodCd} 
 		]]>
 	</update>

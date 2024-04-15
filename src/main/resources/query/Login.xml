@@ -128,7 +128,8 @@
 		   	   SET WEB_AUTH_ID = #{webAuthId},
 		   	       PK = #{pk},
 		   	       PK_ALGO = #{pkAlgo},
-		   	       AAGUID = #{aaguid}
+		   	       AAGUID = #{aaguid},
+		   	       MODIFY_DT = NOW()
 			WHERE  USER_CD = CAST(#{userCd}AS UNSIGNED)
 		]]>
 	</update>
@@ -185,7 +186,8 @@
 		parameterType = "com.red.xip.login.model.P_Login">
 		<![CDATA[
 			UPDATE XIP_USERS
-		   	   SET PW = #{pw}
+		   	   SET PW = #{pw},
+		   	       MODIFY_DT = NOW()
 			WHERE  EMAIL = #{email}
 		]]>
 	</update>
