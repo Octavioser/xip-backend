@@ -8,7 +8,7 @@ import lombok.ToString;
 @Setter
 @ToString
 public class P_Shop {
-	private String season;
+	private String status;
 	private String prodCd;
 	private String prodCdD;
 	private String userCd;
