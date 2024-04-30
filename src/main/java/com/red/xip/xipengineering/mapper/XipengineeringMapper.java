@@ -29,6 +29,7 @@ import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 import com.red.xip.xipengineering.model.TrackingProd;
+import com.red.xip.xipengineering.model.XIP3010modifyData;
 import com.red.xip.xipengineering.model.prodCdColumns;
 
 
@@ -67,7 +68,7 @@ public interface XipengineeringMapper {
 
 	List<R_ProdOrder> selectProdOrder(P_ProdOrder param) throws Exception;
 
-	int updateProdOrder(P_ProdOrder param) throws Exception;
+	int updateProdOrder(XIP3010modifyData param) throws Exception;
 
 	int insertProdD(List<prodCdColumns> prodCdD) throws Exception;
 	

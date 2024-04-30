@@ -12,6 +12,7 @@ public class R_ShipInfo {
 	private String orderCd;
 	private String shippingMethod;
 	private String trackingNum;
+	private String trackingUrl;
 	private String addNm;
 	private String add1;
 	private String add2;

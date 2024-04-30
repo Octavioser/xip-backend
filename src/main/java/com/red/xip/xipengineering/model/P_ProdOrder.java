@@ -1,6 +1,5 @@
 package com.red.xip.xipengineering.model;
-
-import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,9 +17,9 @@ public class P_ProdOrder {
 	private String toDt;
 	private String season;
 	private String searchProdCd;
-	
-	private BigDecimal soldQty;
-	private BigDecimal totalQty;
-	private String prodCd;
 	private String sizeStatus;
+	
+	private List<XIP3010modifyData> modifyData;
+	
+	
 }

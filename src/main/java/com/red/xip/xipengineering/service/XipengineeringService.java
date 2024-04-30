@@ -44,6 +44,7 @@ import com.red.xip.xipengineering.model.R_Shipped;
 import com.red.xip.xipengineering.model.R_Tracking;
 import com.red.xip.xipengineering.model.R_User;
 import com.red.xip.xipengineering.model.TrackingProd;
+import com.red.xip.xipengineering.model.XIP3010modifyData;
 
 @Service
 public class XipengineeringService {
@@ -217,11 +218,12 @@ public class XipengineeringService {
 	@Transactional(rollbackFor = Exception.class)
 	public int updateProdOrder(P_ProdOrder param) throws Exception{
 		try {
-			int result = mapper.updateProdOrder(param);
-			if (result != 1) {
-	            throw new RuntimeException("######### Expected updateProdOrder count 1, but was " + result);
-	        }
-			return result;
+			List<XIP3010modifyData> item = param.getModifyData();
+			int itemLen = item.size();
+			for(int i=0; i<itemLen; i++) {
+				mapper.updateProdOrder(item.get(i));
+			}
+			return itemLen;
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

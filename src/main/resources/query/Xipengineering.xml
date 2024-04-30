@@ -147,6 +147,10 @@
 			SELECT  CONCAT('#XIP-',M.ORDER_CD) AS ORDER_CD,
 			        M.SHIPPING_METHOD,
 			        M.TRACKING_NUM,
+			        CASE WHEN ADD_COUNTRY = 'KOR' 
+			        	 THEN CONCAT('https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=', M.TRACKING_NUM)
+			        	 ELSE CONCAT('https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=', M.TRACKING_NUM) 
+			        	 END AS TRACKING_URL,
 			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
 			        M.ADD_1,
 			        M.ADD_2,
@@ -429,16 +433,13 @@
 		]]>
 	</select>
 	<update id="updateProdOrder" 
-		parameterType = "com.red.xip.xipengineering.model.P_NewProd">
+		parameterType = "com.red.xip.xipengineering.model.XIP3010modifyData">
 		<![CDATA[
 			UPDATE  XIP_PROD_D AS PD
-					INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			   SET  PD.SOLD_QTY = #{soldQty},
 			        PD.TOTAL_QTY = #{totalQty},
 			        PD.MODIFY_DT = NOW()     
-			WHERE   PD.PROD_CD_D = #{prodCd} 
+			WHERE   PD.PROD_CD_D = #{prodCdD} 
 		]]>
 	</update>
 	
