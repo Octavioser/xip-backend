@@ -34,4 +34,5 @@ public class R_OrderD {
 	private String totalAmount;
 	private String shippingAmount;
 	private String subTotal;
+	private String trackingNum;
 }

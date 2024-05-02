@@ -147,7 +147,7 @@
 			SELECT  CONCAT('#XIP-',M.ORDER_CD) AS ORDER_CD,
 			        M.SHIPPING_METHOD,
 			        M.TRACKING_NUM,
-			        CASE WHEN ADD_COUNTRY = 'KOR' 
+			        CASE WHEN M.ADD_COUNTRY = 'KOR' 
 			        	 THEN CONCAT('https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=', M.TRACKING_NUM)
 			        	 ELSE CONCAT('https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=', M.TRACKING_NUM) 
 			        	 END AS TRACKING_URL,
@@ -219,7 +219,10 @@
 			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT,
 			        CONCAT(M.ADD_FIRST_NM, ' ' ,M.ADD_LAST_NM) AS ADD_NM,
 			        DATE_FORMAT(M.SHIP_DT, '%Y-%m-%d %H:%i:%s') AS SHIP_DT,
-			        M.TRACKING_NUM
+			        CASE WHEN M.ADD_COUNTRY = 'KOR' 
+			        	 THEN CONCAT('https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=', M.TRACKING_NUM)
+			        	 ELSE CONCAT('https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=', M.TRACKING_NUM) 
+			        	 END AS TRACKING_NUM
 			FROM    XIP_ORDER AS M
 			        INNER JOIN XIP_INCU AS X
 			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)

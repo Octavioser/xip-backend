@@ -332,8 +332,12 @@
 		        CASE CURRENCY
 		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )
 		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
-		             ELSE '' END AS SUB_TOTAL
-		FROM    XIP_ORDER AS M
+		             ELSE '' END AS SUB_TOTAL,
+		        CASE WHEN ADD_COUNTRY = 'KOR' 
+			        	  THEN CONCAT('https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=', TRACKING_NUM)
+			        	  ELSE CONCAT('https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=', TRACKING_NUM) 
+			        	  END AS TRACKING_NUM
+		FROM    XIP_ORDER
 		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
 	</select>
