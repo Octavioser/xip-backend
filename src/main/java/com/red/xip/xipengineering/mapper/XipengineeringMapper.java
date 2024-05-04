@@ -85,4 +85,12 @@ public interface XipengineeringMapper {
 	int updateProd(P_ProdStatus param) throws Exception;
 
 	R_PayCancel selectCancelPayInfo(P_Cancelling param) throws Exception;
+
+	int checkDeleteProd(String prodCd) throws Exception;
+
+	int deleteProdImage(P_ProdStatus param) throws Exception;
+
+	int deleteProd(P_ProdStatus param) throws Exception;
+
+	int deleteProdCart(P_ProdStatus param) throws Exception;
 }

@@ -1,5 +1,7 @@
 package com.red.xip.xipengineering.model;
 
+import java.math.BigDecimal;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -18,4 +20,5 @@ public class R_ProdStatus {
 	private String season;
 	private String prodDesc;
 	private String prodDescD;
+	private BigDecimal delAble; 
 }

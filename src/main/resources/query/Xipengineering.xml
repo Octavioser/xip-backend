@@ -560,13 +560,22 @@
 					P.SIZE_OPT,
 					P.STATUS,
 					P.PROD_DESC, 
-					P.PROD_DESC_D
+					P.PROD_DESC_D,
+					CASE WHEN IFNULL(D.ORDER_CD,'') = '' THEN 1 
+					     ELSE 0 END AS DEL_ABLE
             FROM    XIP_PROD AS P
-            		INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
+            		LEFT OUTER JOIN (
+                        SELECT  PD.PROD_CD,
+                                MAX(OD.ORDER_CD) AS ORDER_CD
+                        FROM    XIP_PROD_D AS PD 
+                                LEFT OUTER JOIN XIP_ORDER_D AS OD
+                                ON  PD.PROD_CD_D = OD.PROD_CD_D
+                        GROUP BY PD.PROD_CD
+                    ) AS D
+                    ON  D.PROD_CD = P.PROD_CD
             WHERE   ( IFNULL(#{season},'') = '' OR P.SEASON = #{season} )
             AND     ( IFNULL(#{line},'') = '' OR P.LINE = #{line} )
+            AND     ( IFNULL(#{status},'') = '' OR P.STATUS = #{status} )
             AND     ( IFNULL(#{name},'') = '' 
                       OR P.NAME LIKE CONCAT('%',#{name},'%') 
                       OR P.PROD_CD LIKE CONCAT('%',#{name},'%') )
@@ -615,5 +624,40 @@
             WHERE   C.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</select>  
+	
+	<select id="checkDeleteProd" 
+		parameterType = "String"
+		resultType = "int">
+		<![CDATA[
+			SELECT  COUNT(*)
+	       	FROM    XIP_ORDER_D 
+	      	WHERE   PROD_CD_D = #{prodCd}
+		]]>
+	</select>
+	
+	<delete id="deleteProdCart" 
+		parameterType = "com.red.xip.xipengineering.model.P_ProdStatus">
+		<![CDATA[
+			DELETE  C
+			FROM    XIP_CART AS C
+			        INNER JOIN XIP_PROD_D AS PD 
+			        ON  PD.PROD_CD_D = C.PROD_CD_D
+			        AND PD.PROD_CD = #{prodCd}
+		]]>
+	</delete>
+	
+	<delete id="deleteProdImage" 
+		parameterType = "com.red.xip.xipengineering.model.P_ProdStatus">
+		<![CDATA[
+			DELETE FROM XIP_IMAGE WHERE IMAGE_CD = #{prodCd}
+		]]>
+	</delete>
+	
+	<delete id="deleteProd" 
+		parameterType = "com.red.xip.xipengineering.model.P_ProdStatus">
+		<![CDATA[
+			DELETE FROM XIP_PROD WHERE PROD_CD = #{prodCd}
+		]]>
+	</delete>
 	
 </mapper>

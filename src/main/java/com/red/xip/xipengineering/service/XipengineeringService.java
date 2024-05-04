@@ -18,6 +18,7 @@ import org.thymeleaf.context.Context;
 
 import com.red.xip.awsS3Upload.S3Service;
 import com.red.xip.awsSesEmail.service.AwsSesService;
+import com.red.xip.common.CommonUtils;
 import com.red.xip.payment.model.TossPaymentsResponse;
 import com.red.xip.xipengineering.mapper.XipengineeringMapper;
 import com.red.xip.xipengineering.model.P_Canceled;
@@ -293,6 +294,7 @@ public class XipengineeringService {
 		}
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public int updateProdDesc(P_ProdStatus param) throws Exception{
 		// TODO Auto-generated method stub
 		try {
@@ -303,6 +305,7 @@ public class XipengineeringService {
 		}
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public int updateProd(P_ProdStatus param) throws Exception{
 		// TODO Auto-generated method stub
 		try {
@@ -313,10 +316,40 @@ public class XipengineeringService {
 		}
 	}
 
+	@Transactional(rollbackFor = Exception.class)
 	public List<TrackingProd> selectOrdersProdDetails(P_Tracking param) throws Exception{
 		// TODO Auto-generated method stub
 		try {
 			return mapper.selectTrackingProd(param);
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
+			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거
+		}
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	public int deleteProd(P_ProdStatus param) throws Exception{
+		// TODO Auto-generated method stub
+		try {
+			String prodCd = CommonUtils.stringIfNull(param.getProdCd());
+			if("".equals(prodCd)) {
+                throw new RuntimeException("######### Expected 'prodCd' is undefined or has no value prodCd ==" + prodCd);
+			}
+			
+			int check = mapper.checkDeleteProd(prodCd);
+			
+			if(check == 0) {
+				// 해당 제품 장바구니 삭제
+				mapper.deleteProdCart(param);
+				// 이미지 url데이터 삭제  
+				mapper.deleteProdImage(param);
+				// 제품 데이터 삭제
+				mapper.deleteProd(param);
+				//S3 이미지 삭제
+				String filePath = "xItem/i/shop/products/" + prodCd;
+				s3Service.deleteFolder(filePath);
+			}
+			return check;
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

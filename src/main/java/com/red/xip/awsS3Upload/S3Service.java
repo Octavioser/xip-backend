@@ -10,7 +10,9 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 
 @Service
@@ -48,4 +50,21 @@ public class S3Service {
             throw new RuntimeException("S3 업로드 실패", e);
         }
     }
+    
+    // 폴더 삭제
+    public void deleteFolder(String folderPath) {
+        ObjectListing objectListing = s3Client.listObjects(bucketName, folderPath);
+        while (true) {
+            for (S3ObjectSummary os : objectListing.getObjectSummaries()) {
+                s3Client.deleteObject(bucketName, os.getKey());
+            } 
+
+            if (objectListing.isTruncated()) {
+                objectListing = s3Client.listNextBatchOfObjects(objectListing);
+            } else {
+                break;
+            }
+        }
+    }
+    
 }

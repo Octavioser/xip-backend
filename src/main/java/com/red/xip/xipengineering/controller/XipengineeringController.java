@@ -558,32 +558,61 @@ public class XipengineeringController {
 		}
 	}
 	
-		// C100생성 R000출력 U200갱신 D300삭제
-		// selectOrdersProdDetails  구매 상세 정보 가져오기
-		@PostMapping("/incuR013")
-		@ResponseBody
-		public APIResult selectOrdersProdDetails(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
-			/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
-			try {
-				LOG.info("selectOrdersProdDetails 구매 상세 정보 가져오기");
-				// 쿠키 정보 갖고오기
-				String userCd = (String) servletRequest.getAttribute("userCd");
-	    		
-	    		String email = (String) servletRequest.getAttribute("email");
-	    		
-	    		String roleType = (String) servletRequest.getAttribute("roleType");
-				
-				if(!"X".equals(roleType)) {
-					return APIResult.tokenFail();
-				}
-				
-				param.setUserCd(userCd);
-				param.setEmail(email);
-				
-				return APIResult.success(service.selectOrdersProdDetails(param));
-			} catch (Exception e) {
-				LOG.error("Exception [Err_Msg]: {}", e.getMessage());
-				return APIResult.fail(e.getMessage());
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectOrdersProdDetails  구매 상세 정보 가져오기
+	@PostMapping("/incuR013")
+	@ResponseBody
+	public APIResult selectOrdersProdDetails(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_Tracking param) throws Exception {
+		try {
+			LOG.info("selectOrdersProdDetails 구매 상세 정보 가져오기");
+			// 쿠키 정보 갖고오기
+			String userCd = (String) servletRequest.getAttribute("userCd");
+    		
+    		String email = (String) servletRequest.getAttribute("email");
+    		
+    		String roleType = (String) servletRequest.getAttribute("roleType");
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
 			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.selectOrdersProdDetails(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
 		}
+	}
+	
+	// C100생성 R000출력 U200갱신 D300삭제
+	// selectOrdersProdDetails  구매 상세 정보 가져오기
+	@PostMapping("/incuD301")
+	@ResponseBody
+	public APIResult deleteProd(HttpServletRequest servletRequest, HttpServletResponse servletResponse,
+		/* RequestContext session , */ @RequestBody P_ProdStatus param) throws Exception {
+		try {
+			LOG.info("selectOrdersProdDetails 구매 상세 정보 가져오기");
+			// 쿠키 정보 갖고오기
+			String userCd = (String) servletRequest.getAttribute("userCd");
+    		
+    		String email = (String) servletRequest.getAttribute("email");
+    		
+    		String roleType = (String) servletRequest.getAttribute("roleType");
+			
+			if(!"X".equals(roleType)) {
+				return APIResult.tokenFail();
+			}
+			
+			param.setUserCd(userCd);
+			param.setEmail(email);
+			
+			return APIResult.success(service.deleteProd(param));
+		} catch (Exception e) {
+			LOG.error("Exception [Err_Msg]: {}", e.getMessage());
+			return APIResult.fail(e.getMessage());
+		}
+	}
 }
