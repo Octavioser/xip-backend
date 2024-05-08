@@ -193,7 +193,13 @@ public class ShopService {
 	@Transactional(rollbackFor = Exception.class)
 	public int updateCancelOrder(P_OrderD param) throws Exception {
 		try {
-			return mapper.updateCancelOrder(param);
+			int count = mapper.checkUpdateCancelOrder(param);
+			if(count == 1) {
+				return mapper.updateCancelOrder(param);
+			}
+			else {
+				throw new RuntimeException("######### The cancellation period has expired. " + count);
+			}
 		} catch (Exception e) {
 			LOG.error("Exception [Err_Location] : {}", e.getStackTrace()[0]);
 			throw e; // 예외를 다시 던져서 Spring의 트랜잭션 롤백을 트리거

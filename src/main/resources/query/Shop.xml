@@ -285,6 +285,8 @@
 		             WHEN '-1' THEN 'CANCELLED'
 		             ELSE '' END AS ORDER_STATUS,
 		        ORDER_CD,
+		        CASE WHEN DATE_ADD(M.ORDER_DT, INTERVAL 1 HOUR ) >= NOW()
+             		 THEN '1' ELSE '0' END AS CANCEL_ABLE,
 		        CASE CURRENCY
 		             WHEN 'KRW' THEN CONCAT( '₩', FORMAT(TOTAL_AMOUNT,0) )
 		             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT,0) )    
@@ -365,6 +367,19 @@
 		WHERE   D.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		AND     M.USER_CD = CAST(#{userCd}AS UNSIGNED)
 	</select>
+	
+	<select id="checkUpdateCancelOrder" 
+		parameterType = "com.red.xip.shop.model.P_OrderD"
+		resultType="int">
+		
+		SELECT  COUNT(*)
+		FROM    XIP_ORDER
+		WHERE   ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
+		AND     USER_CD = CAST(#{userCd}AS UNSIGNED)
+		AND     ORDER_STATUS = '1'
+		AND     DATE_ADD(ORDER_DT, INTERVAL 1 HOUR ) >= NOW();
+	</select>
+	
 	 
 	<update id ="updateCancelOrder"
 			parameterType = "com.red.xip.shop.model.P_OrderD">

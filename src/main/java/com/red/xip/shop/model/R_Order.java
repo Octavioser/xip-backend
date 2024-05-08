@@ -13,4 +13,5 @@ public class R_Order {
 	private String orderStatus;
 	private String orderCd;
 	private String totalAmount;
+	private String cancelAble;
 }
