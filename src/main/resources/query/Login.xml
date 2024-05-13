@@ -89,7 +89,7 @@
 			FROM   EMAIL_AUTH_CODE
 			WHERE  EMAIL = REPLACE(#{email},' ','')
 			AND    CODE = #{authCd}
-			AND    DATE_ADD(MODIFY_DT, INTERVAL 3 MINUTE) > NOW()
+			AND    DATE_ADD(MODIFY_DT, INTERVAL 10 MINUTE) > NOW()
 		]]>
 	</select>
 	
