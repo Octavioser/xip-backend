@@ -12,9 +12,6 @@
 			        M.EMAIL,
 			        DATE_FORMAT(M.CREAT_DT, '%y%m%d') AS CREAT_DT
 			FROM    XIP_USERS AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			WHERE   ( IFNULL(#{name}, '') = '' OR 
 						M.FIRST_NM LIKE CONCAT('%', #{name}, '%') OR 
 						M.LAST_NM LIKE CONCAT('%', #{name}, '%') )
@@ -49,9 +46,6 @@
 			        CASE WHEN M.CURRENCY = 'USD' THEN TOTAL_AMOUNT - SHIPPING_AMOUNT
 			             ELSE '' END  AS USD_SUB_TOTAL
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			WHERE   CASE WHEN #{orderStatus} = '' THEN TRUE
 					     ELSE M.ORDER_STATUS = #{orderStatus} END
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
@@ -69,9 +63,6 @@
 			        U.EMAIL,
 			        DATE_FORMAT(M.ORDER_DT, '%Y-%m-%d %H:%i:%s') AS ORDER_DT
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        LEFT OUTER JOIN XIP_USERS AS U
 			        ON  U.USER_CD = M.USER_CD
 			WHERE   M.ORDER_STATUS = #{orderStatus}
@@ -98,9 +89,6 @@
 			        M.POSTAL_CD,
 			        IFNULL(M.TRACKING_NUM, '') AS TRACKING_NUM
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</select>
@@ -114,9 +102,6 @@
 			        CONCAT('Size : ',PD.PROD_SIZE) AS PROD_SIZE,
 			        CONCAT('Amount : ',D.PROD_QTY) AS PROD_QTY
 			FROM    XIP_ORDER_D AS D
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        INNER JOIN XIP_PROD_D AS PD
 			        ON  PD.PROD_CD_D = D.PROD_CD_D
 			        INNER JOIN XIP_PROD AS P
@@ -168,9 +153,6 @@
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(TOTAL_AMOUNT - SHIPPING_AMOUNT,0) )    
 			             ELSE '' END AS SUB_TOTAL
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
 		]]>
 	</select>
@@ -181,9 +163,6 @@
 		<![CDATA[
 			SELECT  U.EMAIL
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        LEFT OUTER JOIN XIP_USERS AS U
 			        ON  U.USER_CD = M.USER_CD
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
@@ -198,9 +177,6 @@
 			        CONCAT('Size: ',PD.PROD_SIZE) AS PROD_SIZE,
 			        CONCAT('Amount: ', M.PROD_QTY) AS PROD_QTY
 			FROM    XIP_ORDER_D AS M
-			        INNER JOIN XIP_INCU AS X 
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        INNER JOIN XIP_PROD_D AS PD 
 			        ON  PD.PROD_CD_D = M.PROD_CD_D
 			        INNER JOIN XIP_PROD AS P
@@ -224,15 +200,12 @@
 			        	 ELSE CONCAT('https://service.epost.go.kr/trace.RetrieveEmsRigiTraceList.comm?POST_CODE=', M.TRACKING_NUM) 
 			        	 END AS TRACKING_NUM
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        LEFT OUTER JOIN XIP_USERS AS U 
 			        ON  U.USER_CD = M.USER_CD
 			WHERE   M.ORDER_STATUS IN ('2','3')
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
-			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			AND     ( IFNULL(#{userEmail},'') = '' OR U.EMAIL LIKE CONCAT('%', #{userEmail},'%') )
 			ORDER BY  M.ORDER_DT DESC
 		]]>
 	</select>
@@ -263,9 +236,6 @@
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )    
 			             ELSE '' END AS SUB_TOTAL
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        LEFT OUTER JOIN XIP_USERS AS U 
 			        ON  U.USER_CD = M.USER_CD
 			WHERE   M.ORDER_STATUS = #{orderStatus}
@@ -290,9 +260,6 @@
 			             ELSE 0 END * D.PROD_QTY AS PRICE,
 			        M.CURRENCY
 			FROM    XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        INNER JOIN XIP_ORDER_D AS D 
 			        ON  D.ORDER_CD = M.ORDER_CD
 			        INNER JOIN XIP_PROD_D AS PD
@@ -307,9 +274,6 @@
 		parameterType = "com.red.xip.xipengineering.model.P_Cancelling">
 		<![CDATA[
 			UPDATE  XIP_ORDER AS M
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			   SET  M.ORDER_STATUS = '-1',
 			        M.MODIFY_DT = NOW()
 			WHERE   M.ORDER_CD = CAST(#{orderCd}AS UNSIGNED)
@@ -373,9 +337,6 @@
 			             WHEN 'USD' THEN CONCAT( '$', FORMAT(M.TOTAL_AMOUNT - M.SHIPPING_AMOUNT,0) )    
 			             ELSE '' END AS SUB_TOTAL
 			FROM    XIP_CANCEL AS C
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        INNER JOIN XIP_ORDER AS M 
 			        ON  C.ORDER_CD = M.ORDER_CD
 			        INNER JOIN XIP_USERS AS U
@@ -407,9 +368,6 @@
 			        SUM(CASE WHEN O.CURRENCY = 'USD' THEN IFNULL(O.ORDER_PRICE,0)  * IFNULL(O.PROD_QTY,0) 
 			             ELSE 0 END)  AS USD_SUB_TOTAL
 			FROM    XIP_PROD_D AS PD 
-			        INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			        INNER JOIN XIP_PROD AS P
 			        ON  P.PROD_CD = PD.PROD_CD
 			        LEFT OUTER JOIN (
@@ -542,9 +500,6 @@
 		<![CDATA[	
 			SELECT  P.SEASON
             FROM    XIP_PROD AS P
-            		INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
             GROUP BY P.SEASON
 		]]>
 	</select>  
@@ -586,9 +541,6 @@
 		parameterType = "com.red.xip.xipengineering.model.P_ProdStatus">
 		<![CDATA[
 			UPDATE  XIP_PROD AS P
-					INNER JOIN XIP_INCU AS X
-			        ON  X.USER_CD = CAST(#{userCd}AS UNSIGNED)
-			        AND X.EMAIL = #{email}
 			   SET  P.PROD_DESC = #{prodDesc},
 			        P.PROD_DESC_D = #{prodDescD},
 			        P.MODIFY_DT = NOW()     
