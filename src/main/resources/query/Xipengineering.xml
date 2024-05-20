@@ -241,7 +241,7 @@
 			WHERE   M.ORDER_STATUS = #{orderStatus}
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
-			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			AND     ( IFNULL(#{userEmail},'') = '' OR U.EMAIL LIKE CONCAT('%', #{userEmail},'%') )
 			ORDER BY  M.ORDER_DT DESC
 		]]>
 	</select>
@@ -339,12 +339,12 @@
 			FROM    XIP_CANCEL AS C
 			        INNER JOIN XIP_ORDER AS M 
 			        ON  C.ORDER_CD = M.ORDER_CD
-			        INNER JOIN XIP_USERS AS U
+			        LEFT OUTER JOIN XIP_USERS AS U
 			        ON  U.USER_CD = M.USER_CD 
 			WHERE   M.ORDER_STATUS = '-1'
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') >= #{fromDt}
 			AND     DATE_FORMAT(M.ORDER_DT, '%Y%m%d') <= #{toDt}
-			AND     U.EMAIL LIKE CONCAT('%', #{userEmail},'%')
+			AND     ( IFNULL(#{userEmail},'') = '' OR U.EMAIL LIKE CONCAT('%', #{userEmail},'%') )
 			ORDER BY  M.ORDER_DT DESC
 		]]>
 	</select>
