@@ -11,7 +11,7 @@
                 IFNULL(M.LAST_NM, '') AS LAST_NM,
                 M.EMAIL AS EMAIL,
                 M.USER_CD,
-                
+                M.CREAT_DT,
                 CASE WHEN IFNULL(AD.USER_CD, '')= '' THEN 0 ELSE 1 END AS ADD_COUNT,  
                 IFNULL(AD.ADD_LAST_NM, '') AS ADD_LAST_NM,
                 IFNULL(AD.ADD_FIRST_NM, '') AS ADD_FIRST_NM,
